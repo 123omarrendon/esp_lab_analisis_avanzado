@@ -133,3 +133,12 @@ __blobstorage__
 __queuestorage__
 __azurite_db*__.json
 .python_packages
+
+# Reglas agregadas del repo del curso
+kaggle.json
+data/raw/*
+!data/raw/.gitkeep
+mlflow_local.db
+mlruns/
+.verify-*
+models/final_pipeline.joblib
