@@ -6,7 +6,7 @@
 
 ## Diseño de la búsqueda
 
-- **Finalista(s) optimizado(s):**
+- **Finalista(s) optimizado(s):** propuesta del torneo (`reports/05_torneo.md`): regresión logística y LightGBM; las 28 variables de la etapa 4.
 - **Espacio de búsqueda** (parámetro → rango y por qué ese rango):
 
 | Parámetro | Rango | Motivo |

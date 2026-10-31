@@ -127,7 +127,7 @@ Estructura obligatoria del curso (detalle en `CLAUDE.md`):
 │   ├── README.md                       # Diccionario de variables y cifras del dataset
 │   ├── student_exam_performance.csv    # Datos originales (nunca se modifican)
 │   ├── raw/  processed/                # processed/ guarda train y test
-├── notebooks/                          # 01_caso_negocio … 09_inferencia
+├── notebooks/                          # 01_caso_negocio … 09_inferencia (+ versiones 01b … 05b de este dataset)
 ├── src/proyecto/                       # data/ features/ models/ tracking/ inference/
 ├── tests/
 ├── models/                             # model.joblib + ficha_modelo.md

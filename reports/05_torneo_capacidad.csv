@@ -1,0 +1,11 @@
+avisar al k %,modelo,precisión Fail,recall Fail,máximo recall posible,costo por estudiante
+30,lightgbm,0.98229,0.42579,0.43346,1.99238
+30,línea base (avisar a todos),0.68875,0.29855,0.43346,2.52075
+30,random forest,0.97525,0.42274,0.43346,2.00505
+30,regresión logística,0.98267,0.42595,0.43346,1.9917
+30,xgboost,0.98229,0.42579,0.43346,1.99238
+50,lightgbm,0.94315,0.68137,0.72244,1.13105
+50,línea base (avisar a todos),0.6913,0.49942,0.72244,1.8866
+50,random forest,0.93598,0.67618,0.72244,1.15258
+50,regresión logística,0.94135,0.68007,0.72244,1.13645
+50,xgboost,0.94298,0.68124,0.72244,1.13158

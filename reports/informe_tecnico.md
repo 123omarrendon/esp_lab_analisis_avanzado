@@ -30,13 +30,13 @@ El/la coordinador(a) académico(a) decide qué estudiantes reciben tutoría o re
 
 > Fuente: `reports/04_features.md`.
 
-TODO: ideas probadas, la mejora medida frente al ruido de la validación y qué se **descartó** y por qué.
+Se probaron 8 variantes con LightGBM fijo y 5 pliegues por fila (`notebooks/04b_features_aprueba_o_no.ipynb`). Referencia: 35 variables, costo 0,258 por estudiante frente a 0,308 de «avisar a todos». **Descartadas** (dentro del ruido): `self_study_share`, `prep_total_hours` e indicador de vacío. **Quitadas sin costo:** 7 columnas sin señal (incluida `age`). **Conservada con condición:** `exam_difficulty` (sin ella el costo sube a 0,283: se pierde la mitad de la ventaja sobre «avisar a todos»); es un supuesto de negocio que la institución debe confirmar (¿se conoce al avisar?). Propuesta: 28 variables. Detalle en `reports/04_features.md`. TODO: aprobación del grupo.
 
 ## 4. Torneo de modelos
 
 > Fuente: `reports/05_torneo.md`.
 
-TODO: candidatos, validación común, métrica principal y de control, comparación con el punto de partida, finalistas y motivo.
+Se compararon 4 modelos y una línea base («avisar a todos», costo 0,308) con los mismos 5 pliegues por fila y las 28 variables de la etapa 4 (`notebooks/05b_torneo_aprueba_o_no.ipynb`). **Regresión logística (0,2576), XGBoost (0,2583) y LightGBM (0,2584) empatan** (diferencia de 0,1 a 0,2 veces el ruido); random forest es peor (0,2827; pierde en los 5 pliegues). **Finalistas propuestos: regresión logística y LightGBM.** Advertencias: con el costo 5 : 1 el aviso llega a ≈ 90 de cada 100 estudiantes (especificidad 0,30); sin `exam_difficulty` la ventaja sobre la línea base se reduce a la mitad; el umbral y la calibración se ajustan en las etapas 6 y 7. Detalle en `reports/05_torneo.md`. TODO: aprobación del grupo.
 
 ## 5. Optimización y seguimiento
 

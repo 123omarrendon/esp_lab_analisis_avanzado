@@ -1,0 +1,6 @@
+,costo con las 28,costo sin las 3 (peor caso),± (peor caso),ROC-AUC sin las 3,alertas por 100 sin las 3,ventaja vs. avisar a todos (28),ventaja vs. avisar a todos (peor caso)
+regresión logística,0.25764,0.2816,0.0048,0.85146,93.5975,0.05026,0.0263
+xgboost,0.25827,0.28276,0.00295,0.85348,93.63125,0.04962,0.02514
+lightgbm,0.2584,0.28155,0.00218,0.85388,93.8175,0.0495,0.02635
+random forest,0.28266,0.29591,0.0007,0.84479,98.49375,0.02524,0.01199
+línea base (avisar a todos),0.3079,0.3079,3e-05,0.5,100.0,0.0,0.0

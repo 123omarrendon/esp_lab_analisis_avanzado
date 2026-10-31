@@ -1,0 +1,6 @@
+,ROC-AUC,PR-AUC Fail,exactitud,exactitud balanceada,F1 Fail,precisión Fail,recall Fail,especificidad (recall Pass)
+regresión logística,0.89234,0.94858,0.77581,0.64348,0.85915,0.76008,0.98792,0.29904
+xgboost,0.89415,0.94952,0.77502,0.64217,0.85873,0.7594,0.98797,0.29636
+lightgbm,0.89444,0.94972,0.7746,0.64141,0.85852,0.759,0.98808,0.29474
+random forest,0.88472,0.94367,0.72009,0.54607,0.83166,0.71233,0.99901,0.09313
+línea base (avisar a todos),0.5,0.6921,0.6921,0.5,0.81804,0.6921,1.0,0.0
