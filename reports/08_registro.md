@@ -17,7 +17,7 @@
 
 - Parámetros: _______________
 - Métricas de la prueba: _______________
-- Firma y ejemplo de entrada (¿qué columnas espera?): _______________
+- Firma y ejemplo de entrada (¿qué columnas espera?): solo predictores conocidos antes del examen; nunca `exam_score`, `pass_status`, `performance_grade`, `performance_level`, `questions_correct`, `questions_attempted`, `student_id`, `gender` ni `family_income` (ver `data/README.md`). Lista final: _______________
 - Etiquetas: _______________
 
 ## 3. Comprobación de ida y vuelta

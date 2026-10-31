@@ -34,6 +34,8 @@
 
 ## 4. Errores y carga de trabajo
 
+> Segmentos propuestos: `gender`, `family_income`, `urban_rural`, `school_type`, `education_level`.
+
 | Segmento | Casos | Métrica | % que el modelo marca | % real |
 |---|---|---|---|---|
 | | | | | |
@@ -45,7 +47,7 @@
 
 - Variables que más pesan (y qué significa para el negocio): _______________
 - **Límite de la explicación:** explica al modelo, no al mundo; no dice si el modelo acertó: _______________
-- Atributos sensibles o de uso regulado entre las variables (¿cuáles, y qué se hace?): _______________
+- Atributos sensibles o de uso regulado entre las variables (¿cuáles, y qué se hace?): `gender` y `family_income` no entran como predictores (`family_income`: `Fail` 75,5 % con ingreso bajo vs 60,5 % con alto); `age` (14–20, incluye menores), `parent_education`, `urban_rural` y `school_type` se usan solo si el grupo lo justifica. Auditar *recall*, precisión y NPV de `Fail` por `gender`, `family_income`, `urban_rural` y `school_type` (tabla del apartado 4). Resultado: _______________
 
 ## 6. Conclusión
 

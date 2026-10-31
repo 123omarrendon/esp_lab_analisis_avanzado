@@ -141,3 +141,14 @@ Prepáralas: se hacen a un integrante **distinto** de quien escribió el código
 ## 7. Qué NO tienes que dominar
 
 Servidores, contenedores, Docker ni infraestructura de nube. Con el enlace de Streamlit Community Cloud basta.
+
+---
+
+<!-- contexto-dataset -->
+## Aplicación a este proyecto (dataset de rendimiento estudiantil)
+
+- **Entradas de la app:** solo predictores conocidos antes del examen (ver `data/README.md`); nunca `exam_score`, `performance_grade`, `performance_level`, `questions_correct`, `questions_attempted`, `student_id` ni `gender`.
+- **Validaciones sugeridas según los rangos reales del CSV:** `age` 14–20, `attendance_percentage`, `previous_exam_score` y `assignment_completion_rate` entre 0 y 100, `previous_gpa` entre 1 y 4, `sleep_hours` entre 0 y 24, horas de estudio no negativas.
+- **Aviso de uso responsable (obligatorio en la app):** el resultado es una alerta para revisión humana; no sanciona, excluye ni limita oportunidades de un estudiante.
+- **Demo (3 casos):** uno normal; uno límite que cambie la decisión (se define con el modelo final); uno inválido (por ejemplo, `attendance_percentage` = 150), que la app debe rechazar con un mensaje claro.
+- **Titular para no técnicos:** se aprueba con 70 o más y de cada 100 estudiantes unos 69 no llegan a 70; sin modelo no se sabe de antemano a quién ayudar y no se puede dar tutoría a todos. La cifra con el modelo sale de `reports/07_validacion.md`.

@@ -497,3 +497,15 @@ Prepáralas con tu grupo; **las responderá la persona que no escribió el códi
   con registro de cada ensayo y comprobación con entidades reservadas.
 - `material-del-curso/guias/databricks-mlflow.md`: conexión, experimentos y respaldo local.
 - `material-del-curso/kit/checklist-revision-ia.md`: cómo revisar lo que genere Claude.
+
+---
+
+<!-- contexto-dataset -->
+## Aplicación a este proyecto (dataset de rendimiento estudiantil)
+
+- **Pliegues:** `StratifiedKFold` por fila sobre `pass_70` (no `StratifiedGroupKFold`: `student_id` es único). Semilla 42.
+- **Métricas principales:** costo esperado por estudiante (5 a 1), *recall* de `Fail` y NPV. **Controles:** precisión de `Fail` (> 69,2 %), F1 y F2, PR-AUC, exactitud balanceada, alertas por 100. Clase de interés: `Fail` (69,2 %).
+- **Línea base:** «avisar a todos» (costo 0,31; exactitud 69,2 %; *recall* 100 %). Todo modelo debe costar menos, lo que equivale a un **NPV > 83,3 %**. «Nunca avisar» cuesta 3,46 y el azar 1,28.
+- **`Fail` es la clase mayoritaria (69,2 % / 30,8 %):** el *recall* solo se «gana» avisando a todos y la exactitud premia a la clase mayoritaria; se leen siempre junto con la precisión y el NPV. Empezar sin remuestreo y ajustar el umbral con validación (con 5 a 1, avisar si P(Fail) ≥ 0,167).
+- **Ideas de variables a medir:** `self_study_share` (`self_study_hours` / `study_hours_per_day`; no sumar horas, porque la primera es una parte de la segunda), indicadores de vacío, y las variables "a revisar" con y sin (`time_management_score`, `exam_anxiety_level`, `exam_difficulty`). Ver `reports/04_features.md`.
+- **Entidades reservadas y remuestreo del intervalo:** son filas, porque cada fila es un estudiante distinto.

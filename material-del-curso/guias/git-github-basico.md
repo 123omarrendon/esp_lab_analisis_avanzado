@@ -85,3 +85,10 @@ muy difíciles de leer: que **una sola persona** edite cada notebook a la vez.
 - Copia el mensaje de error completo y pégalo a Claude diciendo qué comando ejecutaste.
 - Antes de usar comandos que borran historial (`reset --hard`, `push --force`), pregunta al
   instructor: pueden perder el trabajo de todo el grupo.
+
+---
+
+<!-- contexto-dataset -->
+## Aplicación a este proyecto (dataset de rendimiento estudiantil)
+
+Para este proyecto: repositorio `https://github.com/123omarrendon/esp_lab_analisis_avanzado`, rama de trabajo `feature/orendon`. No subir `.env`. El CSV pesa unos 25 MB: confirmar la licencia antes de seguir versionándolo. No dejar copias del repo del curso dentro de este repo: una carpeta con su propio `.git` queda como repositorio anidado; mantenerla fuera (por ejemplo `../curso-referencia`).

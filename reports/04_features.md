@@ -9,10 +9,12 @@
 <!-- Modelo con parámetros fijos, métrica principal y de control, número y tipo de pliegues
      (por qué entidad se parte), semilla. Los MISMOS pliegues para todas las variantes. -->
 
+> Contexto fijo del caso (`data/README.md`): objetivo `pass_70` (aprueba con 70 o más), clase de interés `Fail` (69,2 %); **no se pueden usar** `exam_score`, `pass_status` (corte en 50), `performance_grade`, `performance_level`, `questions_correct` ni `questions_attempted`.
+
 - **Modelo (parámetros fijos):**
-- **Métrica principal** (y por qué):
-- **Métricas de control:**
-- **Pliegues** (cuántos y partidos por qué entidad):
+- **Métrica principal** (y por qué): costo esperado por estudiante, con *recall* de `Fail` y NPV (propuesta; ver `especificacion-proyecto.md`, sección 4). La referencia a vencer es «avisar a todos» (costo 0,31 con 5 a 1).
+- **Métricas de control:** precisión de `Fail` (> 69,2 %), F1 y F2 de `Fail`, PR-AUC de `Fail`, alertas por 100.
+- **Pliegues** (cuántos y partidos por qué entidad): por fila, estratificados por `pass_70` (`student_id` es único, no hay entidades repetidas). Cuántos: por definir.
 - **Regla de decisión escrita antes de medir:**
 
 ## Tabla de ideas medidas
@@ -23,9 +25,9 @@
 | # | Idea (variable y cómo se calcula) | ¿Se conoce al predecir? | Métrica (± ruido) | Mejora / ruido | Decisión |
 |---|---|---|---|---|---|
 | 0 | **Referencia** | — | | 0 | — |
-| 1 | | ☐ sí ☐ no | | | ☐ conservar ☐ descartar |
-| 2 | | ☐ sí ☐ no | | | ☐ conservar ☐ descartar |
-| 3 | | ☐ sí ☐ no | | | ☐ conservar ☐ descartar |
+| 1 | `self_study_share` = `self_study_hours` / `study_hours_per_day` *(idea por medir; no se suman las horas: `self_study_hours` es una parte de `study_hours_per_day` en el 100 % de las filas)* | ☑ sí | | | ☐ conservar ☐ descartar |
+| 2 | Indicador de vacío (0/1) de `attendance_percentage`, `previous_gpa` y `time_management_score` *(idea por medir)* | ☑ sí | | | ☐ conservar ☐ descartar |
+| 3 | Incluir `time_management_score`, `exam_anxiety_level` y `exam_difficulty` (con y sin) *(idea por medir)* | ☐ sí ☐ no: confirmar cuándo se miden | | | ☐ conservar ☐ descartar |
 
 ## Decisiones y motivos
 

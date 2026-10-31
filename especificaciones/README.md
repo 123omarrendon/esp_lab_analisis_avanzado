@@ -9,6 +9,10 @@ criterio y cómo sabrán que quedó bien. Claude las lee antes de generar códig
 | [`02-eda.md`](02-eda.md) | **Clase 2 · viernes 30 de octubre**, bloque de EDA | `reports/01_eda.md` con ≥ 5 decisiones |
 | [`03-preprocesamiento.md`](03-preprocesamiento.md) | **Clase 2 · viernes 30 de octubre**, bloque de limpieza y partición | `src/proyecto/data/` + `pytest` en verde |
 
+**Dataset del proyecto.** Las dos especificaciones ya traen lo medido en `data/student_exam_performance.csv` (objetivo `pass_70`: aprueba con 70 o más,
+columnas con fuga, vacíos, partición). El diccionario completo está en [`../data/README.md`](../data/README.md). Son propuestas: el grupo las
+revisa y aprueba antes de marcar la especificación como cerrada.
+
 **Relación con Spec Kit.** Estas guías son **la entrada**: lo que escriben aquí se pasa a `/speckit-specify`, que lo convierte
 en `specs/<nº>/spec.md`; después `/speckit-plan` y `/speckit-tasks` producen el plan y la lista de tareas (`tasks.md`).
 Ver `material-del-curso/guias/entorno-ia-specify.md`.

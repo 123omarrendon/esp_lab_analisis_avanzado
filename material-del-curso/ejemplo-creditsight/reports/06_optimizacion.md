@@ -51,3 +51,10 @@ y cada lanzamiento volvió a registrar sus ensayos. Los ensayos repetidos dan **
 (misma semilla), así que no cambian ninguna conclusión; para la tabla se conservó **una sola copia** de cada ensayo
 (la primera registrada). Lección para el equipo: la búsqueda de Optuna es reanudable (`storage=` en `tune`) y conviene
 usarla cuando el cómputo es de otro, porque una ejecución que se reintenta duplica el tracking.
+
+---
+
+<!-- contexto-dataset -->
+## Aplicación a este proyecto (dataset de rendimiento estudiantil)
+
+Este archivo es el **ejemplo de otro caso (CreditSight)**; no se adapta a este proyecto. Úsalo solo como modelo de redacción. Los documentos equivalentes de este proyecto están en la raíz del repositorio: `CLAUDE.md`, `README.md`, `especificacion-proyecto.md`, `reports/00_caso.md`, `reports/01_eda.md` y `reports/06_optimizacion.md`, con el dataset de rendimiento estudiantil (objetivo `pass_70`: se aprueba con 70 o más; ver `data/README.md`).

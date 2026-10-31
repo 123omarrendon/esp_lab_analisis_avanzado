@@ -358,3 +358,14 @@ con `streamlit run` antes de pedir el siguiente.
 - `material-del-curso/ejemplo-creditsight/src/creditsight/inference/predict.py` (el equivalente del módulo de la plantilla, con matriz de costos)
 - `material-del-curso/ejemplo-creditsight/app/streamlit_app.py` (la app de CreditSight)
 - `material-del-curso/guias/databricks-mlflow.md` (conexión y registro)
+
+---
+
+<!-- contexto-dataset -->
+## Aplicación a este proyecto (dataset de rendimiento estudiantil)
+
+- **Errores por segmento (propuesta):** `gender`, `family_income`, `urban_rural`, `school_type`, `education_level`. Comparar *recall* y precisión de `Fail` entre grupos y anotar si a algún grupo le va peor.
+- **Interpretación:** las variables que más pesan describen al modelo, no causas. Las correlaciones con la nota más altas son `previous_exam_score` (0,49) y `previous_gpa` (0,47); varias variables (`private_tuition`, `internet_access`, `daily_screen_time`) tienen correlación ≈ 0.
+- **Firma del modelo registrado:** solo los predictores finales; sin las 6 columnas de fuga, `student_id`, `gender` ni `family_income`.
+- **Carga de trabajo:** el modelo prioriza estudiantes para revisión humana; medir cuántas alertas genera por cada 100 estudiantes frente al 69,2 % que realmente pierde el curso (no se puede apoyar a todos: usar *recall* y precisión en el top k %).
+- **Límite que declarar:** posible origen sintético del dataset y sin dimensión temporal (no se evaluó estabilidad en el tiempo).

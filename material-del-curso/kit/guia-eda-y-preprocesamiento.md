@@ -1,6 +1,6 @@
 # Guía de trabajo: EDA y preprocesamiento (clase 2 · hito H1)
 
-Esta guía es para **tu dataset**, no para el de CreditSight. El ejemplo del instructor
+Esta guía es para **data/student_exam_performance.csv**, no para el de CreditSight. El ejemplo del instructor
 (`material-del-curso/ejemplo-creditsight/notebooks/02_eda.ipynb`, `material-del-curso/ejemplo-creditsight/notebooks/03_preprocesamiento.ipynb` y
 `material-del-curso/ejemplo-creditsight/reports/01_eda.md`) te muestra **cómo se razona**, pero sus cifras y sus decisiones no
 valen para otros datos: cada hallazgo de tu EDA lo tienes que medir tú.
@@ -20,7 +20,7 @@ limpieza **reproducible por script**.
 - **Llena primero las especificaciones de hoy**: `especificaciones/02-eda.md` (antes del EDA) y
   `especificaciones/03-preprocesamiento.md` (antes de pedirle código a Claude). Son tu lista de trabajo y el
   contrato que Claude implementa.
-- Tu dataset está en `data/raw/`. **Ese archivo no se modifica nunca**: toda limpieza se hace en
+- Tu dataset está en `data/student_exam_performance.csv`. **Ese archivo no se modifica nunca**: toda limpieza se hace en
   código y se guarda aparte en `data/processed/`.
 - Si el dataset trae **datos personales** (nombres, documentos, teléfonos, correos), no los
   mires ni los imprimas: elimínalos al cargar (ver sección 4).
@@ -39,7 +39,7 @@ respuesta depende **cómo se parte el dato** y cómo se valida el modelo.
 ```python
 import pandas as pd
 
-df = pd.read_csv("data/raw/<archivo>.csv")
+df = pd.read_csv("data/student_exam_performance.csv")
 print(df.shape)
 
 # ¿Qué columna identifica a la entidad (cliente, paciente, empresa...)?
@@ -306,7 +306,7 @@ Prepáralas con tu grupo; **las responderá la persona que no escribió el códi
 | Trampa | Por qué falla | Qué hacer |
 |---|---|---|
 | Limpiar en el notebook "a mano" | No se reproduce ni se prueba | Función en `src/` + prueba |
-| Modificar `data/raw/` | Pierdes el original | Guardar siempre en `data/processed/` |
+| Modificar `data/student_exam_performance.csvl original | Guardar siempre en `data/processed/` |
 | Partir por fila cuando hay entidades repetidas | Fuga: el modelo "reconoce" a la entidad | Partición por entidad + prueba |
 | Imputar con la media global antes de partir | Fuga con datos de la prueba | Imputar **dentro** del pipeline |
 | Borrar filas con valores raros | Pierdes datos y sesgas la muestra | Marcar como vacío e imputar luego |
@@ -325,3 +325,22 @@ Prepáralas con tu grupo; **las responderá la persona que no escribió el códi
 - `material-del-curso/ejemplo-creditsight/notebooks/03_preprocesamiento.ipynb` · `material-del-curso/ejemplo-creditsight/src/creditsight/data/`: de las
   decisiones a código con pruebas, y la demostración de la fuga por partición.
 - `material-del-curso/kit/checklist-revision-ia.md`: cómo revisar lo que genere Claude.
+
+---
+
+<!-- contexto-dataset -->
+## Aplicación a este proyecto (dataset de rendimiento estudiantil)
+
+Las 5 preguntas del EDA, respondidas para este dataset (cifras medidas con la regla de **aprobar con 70 o más**; confirmarlas al correr `notebooks/02b_eda_aprueba_o_no.ipynb`):
+
+| Pregunta | Respuesta |
+|---|---|
+| 1. Unidad de análisis | Un estudiante por fila. `ID_COL` = `student_id`, **no se repite** (100.000 ids distintos) |
+| 2. Objetivo | `TARGET` = `pass_70` (derivado de `exam_score`; `Pass` si ≥ 70): `Fail` 69,2 % / `Pass` 30,8 %. Línea base con costos 5 a 1: «avisar a todos» cuesta 0,31 (la estrategia a vencer), «nunca avisar» 3,46 y el azar 1,28. `pass_status` del dataset usa el corte de 50 y no es el objetivo |
+| 3. Suciedad | 7 columnas con vacíos (3,0 %–9,9 %); 0 duplicados; 0 valores fuera de rango; extremos plausibles (`study_hours_per_day` máx. 12, p99 8,4; `online_learning_hours` máx. 15, p99 9,2). Es un dataset bastante limpio |
+| 4. Variables que deberían ser estables | No aplica: ninguna entidad se repite |
+| 5. Sospecha de fuga | `exam_score`, `pass_status` (corte 50), `performance_grade`, `performance_level`, `questions_correct`, `questions_attempted`; a medir con y sin: `time_management_score`, `exam_anxiety_level`, `exam_difficulty` |
+
+- **Partición:** por fila, estratificada por `pass_70` (no por grupo).
+- **Datos personales:** sin nombres ni documentos; `student_id` se pasa al índice; `gender` y `family_income` salen de las variables de entrada; `age` incluye menores.
+- Detalle y decisiones: `especificaciones/02-eda.md` y `reports/01_eda.md`.

@@ -6,7 +6,7 @@
 
 ## Qué es
 
-_______________  (en 2 frases: qué predice el modelo, para quién y para apoyar qué decisión)
+Estima la probabilidad de que un estudiante pierda el curso (`pass_70` = `Fail`, nota menor que 70; se aprueba con 70 o más), para que el/la coordinador(a) académico(a) priorice la tutoría o el refuerzo antes del examen final. Es una alerta para revisión humana, no una decisión automática.
 
 - **Modelo:** _______________
 - **Registro:** _______________ versión _______________, alias `champion` (Databricks o local)
@@ -14,10 +14,10 @@ _______________  (en 2 frases: qué predice el modelo, para quién y para apoyar
 
 ## Datos de entrenamiento
 
-- **Fuente y licencia:** _______________
-- **Tamaño:** _______________ filas de _______________ entidades
-- **Partición:** por _______________  (la unidad de análisis); la prueba se abrió **una sola vez**
-- **Datos personales:** _______________  (qué se eliminó o anonimizó)
+- **Fuente y licencia:** Student Exam Performance & Success Dataset (Mobeen Fatimah, Kaggle). Licencia: _______________ (pendiente de verificar)
+- **Tamaño:** 100.000 filas de 100.000 entidades (un estudiante por fila)
+- **Partición:** por fila, estratificada por `pass_70` (la unidad de análisis es un estudiante y `student_id` es único); la prueba se abrió **una sola vez**: _______________
+- **Datos personales:** sin nombres ni documentos; `student_id` y `gender` no entran al modelo. `age` (14–20, incluye menores) y otros atributos demográficos se tratan como sensibles.
 
 ## Rendimiento (prueba, entidades nunca vistas)
 
@@ -33,10 +33,10 @@ _______________
 
 ## Límites y usos no recomendados
 
-- Datos con los que se entrenó (¿sintéticos, de una época, de una región?): _______________
-- Supuestos de negocio de los que depende (p. ej. una variable que debe conocerse al decidir): _______________
-- Atributos sensibles o de uso regulado: _______________
-- Qué **no** debe hacerse con este modelo: _______________
+- Datos con los que se entrenó (¿sintéticos, de una época, de una región?): dataset público de Kaggle sin fecha ni región; hay indicios de origen sintético (varias variables sin relación con la nota, `study_method` repartido en cinco partes iguales). A confirmar.
+- Supuestos de negocio de los que depende (p. ej. una variable que debe conocerse al decidir): todas las variables de entrada deben conocerse **antes del examen**. Por eso se excluyen `exam_score`, `pass_status` (corte en 50), `performance_grade`, `performance_level`, `questions_correct` y `questions_attempted`. Con 69,2 % de `Fail`, el modelo solo aporta si supera a «avisar a todos» (NPV > 83,3 % con costos 5 a 1).
+- Atributos sensibles o de uso regulado: `gender` (fuera del modelo), `age` (menores de edad), `family_income`, `parent_education`, `urban_rural`, `school_type`.
+- Qué **no** debe hacerse con este modelo: sancionar, excluir o limitar oportunidades de un estudiante; usarlo como única base de una decisión; interpretarlo como explicación de causas.
 - Lo que **no se evaluó** (estabilidad en el tiempo, otros grupos, deriva): _______________
 
 ## Reproducibilidad

@@ -146,3 +146,10 @@ Si no encuentras la opción, busca "app logs" en la documentación oficial de St
 - Cómo funciona la nube por dentro.
 - Streamlit más allá de lo que Claude y el ejemplo del curso te muestran: formulario, botón y
   resultado.
+
+---
+
+<!-- contexto-dataset -->
+## Aplicación a este proyecto (dataset de rendimiento estudiantil)
+
+Para la app de este proyecto: los campos del formulario son los predictores finales (ver `data/README.md`) con los rangos reales del CSV (`age` 14–20, porcentajes 0–100, `previous_gpa` 1–4). Debe cargar `models/model.joblib` y mostrar el aviso de que el resultado es una alerta para revisión humana. El repo es público: confirmar la licencia del CSV antes de incluirlo.

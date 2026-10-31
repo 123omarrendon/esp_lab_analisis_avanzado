@@ -20,6 +20,18 @@ Este archivo lo lees al inicio de cada conversación. Sigue estas reglas siempre
 - Para revisar uso los subagentes de `.claude/agents/` (`auditor-de-fuga`, `escritor-de-pruebas`, `revisor-de-codigo-ia`);
   sus informes no reemplazan que yo entienda el código.
 
+## Datos del proyecto (resumen; el detalle está en `data/README.md`)
+
+- **Archivo:** `data/student_exam_performance.csv` (100.000 filas × 44 columnas; una fila = un estudiante, `student_id` único).
+- **Regla de aprobación:** el estudiante **aprueba con 70 o más** y **pierde el curso con menos de 70** (69 y 69,99 pierden; 70 aprueba).
+- **Objetivo:** `pass_70` (`Pass` 30,8 % / `Fail` 69,2 %), derivado de `exam_score` con `add_target` (`src/proyecto/data/cleaning.py`); clasificación binaria, clase de interés `Fail`. **No uses `pass_status`** como objetivo: el dataset lo calcula con corte en 50.
+- **Métricas:** costo esperado por estudiante (falso negativo : falso positivo = 5 : 1, supuesto), *recall* de `Fail` y NPV. La estrategia sin modelo a vencer es «avisar a todos» (costo 0,31); un modelo la supera solo con NPV > 83,3 %. La exactitud y el *recall* solos no sirven.
+- **Nunca uses como entrada:** `exam_score`, `pass_status` (corte 50), `performance_grade`, `performance_level`, `questions_correct`, `questions_attempted` (derivan de la nota o son datos del examen), `student_id`, `gender` y `family_income`. El objetivo se crea **antes** de quitar `exam_score`.
+- **Con y sin (etapa 4):** `time_management_score`, `exam_anxiety_level`, `exam_difficulty`.
+- **Partición:** por fila, estratificada por `pass_70` (no hay entidades repetidas), 80/20, semilla 42 (`split_train_test`).
+- **Vacíos** en 7 columnas (`attendance_percentage`, `time_management_score`, `notes_quality`, `previous_gpa`, `sleep_quality`, `parent_education`, `device_availability`): no se borran filas; se resuelven dentro del `Pipeline`.
+- **Sensibles:** `age` (incluye menores), `gender`, `family_income`, `parent_education`, `urban_rural`, `school_type`: audita el desempeño por grupo.
+
 ## Estructura obligatoria del repositorio
 
 ```text

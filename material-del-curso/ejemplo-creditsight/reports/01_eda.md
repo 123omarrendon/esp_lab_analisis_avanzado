@@ -51,3 +51,10 @@ implementada con pruebas en `src/creditsight/data/`.
   mide en la etapa 4 y se discute en el reporte.
 - El 20 % de `Credit_Mix` perdido, el 7,6 % de `Payment_Behaviour` perdido y varios vacíos de
   columnas mensuales (2–9 %) se imputan **dentro del pipeline**, ajustados solo con entrenamiento.
+
+---
+
+<!-- contexto-dataset -->
+## Aplicación a este proyecto (dataset de rendimiento estudiantil)
+
+Este archivo es el **ejemplo de otro caso (CreditSight)**; no se adapta a este proyecto. Úsalo solo como modelo de redacción. Los documentos equivalentes de este proyecto están en la raíz del repositorio: `CLAUDE.md`, `README.md`, `especificacion-proyecto.md`, `reports/00_caso.md`, `reports/01_eda.md` y `reports/06_optimizacion.md`, con el dataset de rendimiento estudiantil (objetivo `pass_70`: se aprueba con 70 o más; ver `data/README.md`).

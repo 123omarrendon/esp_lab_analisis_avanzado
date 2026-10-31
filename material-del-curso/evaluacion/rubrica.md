@@ -111,3 +111,10 @@ La nota final de cada estudiante = suma ponderada de A1–C (nota del grupo) y D
 > **porcentaje = Σ peso × (nivel ÷ 3)**, con nivel de 0 a 3 en cada criterio.
 
 La escala de la nota final (0–5, 0–10 o 0–100) la define el instructor en la clase 1.
+
+---
+
+<!-- contexto-dataset -->
+## Aplicación a este proyecto (dataset de rendimiento estudiantil)
+
+Dónde está la evidencia de este proyecto: caso en `reports/00_caso.md`; datos, fuga y partición en `reports/01_eda.md` y `especificaciones/`; variables y modelos en `reports/04` a `06`; validación y equidad en `reports/07_validacion.md`; límites del modelo en `models/ficha_modelo.md`. Diccionario de datos: `data/README.md`.

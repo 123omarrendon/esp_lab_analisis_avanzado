@@ -112,3 +112,10 @@ clase 1 (jueves 29 de octubre) para acordar una alternativa antes de empezar.
 
 *Fuentes consultadas para esta sección:* [Anthropic — uso del plan Pro](https://support.claude.com/en/articles/8324991-about-claude-s-pro-plan-usage)
 y guías de terceros (cifras sin verificar con Anthropic).
+
+---
+
+<!-- contexto-dataset -->
+## Aplicación a este proyecto (dataset de rendimiento estudiantil)
+
+Al pedirle código a la IA en este proyecto, recuérdale desde el inicio: se aprueba con 70 o más y el objetivo es `pass_70` (nunca `pass_status`, que usa el corte de 50); **no usar** `exam_score`, `pass_status`, `performance_grade`, `performance_level`, `questions_correct`, `questions_attempted`, `student_id`, `gender` ni `family_income` como entrada; partición por fila estratificada (no por grupo); métricas costo por estudiante, *recall* de `Fail` y NPV; imputación solo dentro del `Pipeline`. Si la IA propone una columna que no está en `data/README.md`, la inventó.

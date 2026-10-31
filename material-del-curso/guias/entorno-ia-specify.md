@@ -143,3 +143,10 @@ terminada.
 | La constitución quedó genérica (*«escribir buen código»*) | Una regla sin criterio medible no sirve. Reescríbela como: **qué** se prohíbe o exige, **cómo se comprueba** y **por qué** |
 | El subagente **inventó** un hallazgo | Revisa su cita `archivo:línea`. Un hallazgo sin línea que lo pruebe se descarta |
 | Subí `.env` por error al hacer commit del entorno de IA | Avisa al instructor y **genera un token nuevo**. `.claude/` y `.specify/` sí se suben; `.env` nunca |
+
+---
+
+<!-- contexto-dataset -->
+## Aplicación a este proyecto (dataset de rendimiento estudiantil)
+
+Texto base para `/speckit-specify` de la primera pieza (limpieza y partición): "Cargar `data/student_exam_performance.csv`, crear el objetivo `pass_70` desde `exam_score` (`Pass` si la nota es ≥ 70, `Fail` si es < 70; 69 pierde), excluir `exam_score`, `pass_status`, `performance_grade`, `performance_level`, `questions_correct`, `questions_attempted`, `student_id`, `gender` y `family_income` de las variables de entrada, dejar los vacíos de 7 columnas para el `Pipeline`, y partir 80/20 por fila estratificado por `pass_70` con semilla 42." Detalle en `especificaciones/03-preprocesamiento.md`.

@@ -174,3 +174,10 @@ Si prefieres trabajar siempre en local (por ejemplo, para ahorrar cuota), agrega
 - Escribir código dentro de Databricks: tu código vive en tu repo y se ejecuta en tu computador.
 - Model Serving ni Databricks Apps: no son parte del curso. Si tu cuenta los ofrece, son opcionales
   (verifica en tu cuenta qué incluye).
+
+---
+
+<!-- contexto-dataset -->
+## Aplicación a este proyecto (dataset de rendimiento estudiantil)
+
+Sugerencias para este proyecto: experimento `rendimiento-estudiantil-optimizacion`; etiquetas `etapa` y `modelo`; métricas registradas por ensayo: `cost_per_student` (principal), `recall_fail`, `npv`, `precision_fail`, `f1_fail` y `pr_auc_fail`. Para registrar el modelo, la firma debe incluir solo los predictores finales (sin las 6 columnas de fuga, `student_id`, `gender` ni `family_income`).

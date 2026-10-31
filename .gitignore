@@ -142,3 +142,7 @@ mlflow_local.db
 mlruns/
 .verify-*
 models/final_pipeline.joblib
+
+# Datos generados por el notebook 03 (se regeneran; no se versionan)
+data/processed/*
+!data/processed/.gitkeep

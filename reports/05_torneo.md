@@ -6,10 +6,10 @@
 
 ## Reglas del torneo
 
-- **Mismos datos y mismos pliegues para todos** (partidos por qué entidad):
-- **Línea base** (qué es y cuánto da):
+- **Mismos datos y mismos pliegues para todos** (partidos por qué entidad): por fila, estratificados por `pass_70`; `student_id` es único, no hay entidades repetidas.
+- **Línea base** (qué es y cuánto da): con costos 5 a 1, «nunca avisar» cuesta 3,46 por estudiante, el azar 1,28 y **«avisar a todos» 0,31** (la estrategia a vencer; exactitud 69,2 %, *recall* de `Fail` 100 %). Un modelo la supera solo con NPV > 83,3 %.
 - **Métrica principal** (la del negocio) y **métricas técnicas** que reportas (AUC, PR-AUC, exactitud balanceada,
-  precisión y recall por clase, F1 macro, log loss; en regresión: RMSE, MAE, R²):
+  precisión y recall por clase, F1 macro, log loss; en regresión: RMSE, MAE, R²): principal = costo por estudiante, *recall* de `Fail` y NPV; clase de interés = `Fail` (69,2 % de los casos).
 - **Variables usadas** (las decididas en `reports/04_features.md`):
 
 ## Tabla comparativa

@@ -35,3 +35,17 @@
 - Resultados sin que se haya ejecutado nada, o gráficos que no corresponden a tus datos.
 - Librerías o funciones que no existen o que da error al importar.
 - Cambios en archivos que no pediste.
+
+---
+
+<!-- contexto-dataset -->
+## Aplicación a este proyecto (dataset de rendimiento estudiantil)
+
+Puntos de revisión propios de este dataset. Si la respuesta a alguno es "no", el código no se acepta:
+
+- ¿Alguna columna de entrada es `exam_score`, `performance_grade`, `performance_level`, `questions_correct`, `questions_attempted`, `student_id` o `gender`? **No debe haber ninguna.**
+- ¿La partición es **estratificada por `pass_70`** y por fila? (`student_id` es único: no hay estudiantes repetidos, así que `GroupShuffleSplit` no aplica.)
+- ¿Se reporta el costo, el *recall* y el NPV, y no solo la exactitud? («Siempre Fail» ya da 69,2 % de exactitud y 100 % de *recall*.) ¿La regla es nota ≥ 70 (69 pierde, 70 aprueba)?
+- ¿La imputación de las 7 columnas con vacíos (`attendance_percentage`, `time_management_score`, `notes_quality`, `previous_gpa`, `sleep_quality`, `parent_education`, `device_availability`) está **dentro del `Pipeline`**?
+- ¿Claude inventó alguna columna? El dataset tiene exactamente 44 (ver `data/README.md`).
+- ¿Se imprimieron datos de `age`, `gender` o ingreso familiar de estudiantes concretos?

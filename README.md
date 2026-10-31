@@ -10,7 +10,7 @@ El modelo debe utilizarse como una herramienta de apoyo y no como un mecanismo a
 
 - **Dataset:** [Student Exam Performance & Success Dataset — Kaggle](https://www.kaggle.com/datasets/mobeenfatimah/student-exam-performance-and-success-dataset)
 - **Autor en Kaggle:** Mobeen Fatimah.
-- **Formato esperado:** archivo(s) CSV descargados desde Kaggle.
+- **Archivo:** `data/student_exam_performance.csv` — 100.000 estudiantes (una fila cada uno) y 44 columnas. Diccionario de variables, roles y cifras: [`data/README.md`](data/README.md).
 - **Uso en este proyecto:** análisis exploratorio, preparación de datos y construcción/evaluación de un modelo predictivo de rendimiento académico.
 
 Antes de iniciar el análisis, se debe descargar el dataset desde Kaggle y verificar el nombre del archivo, las columnas, el diccionario de datos, la licencia y las condiciones de uso. La estructura exacta debe confirmarse sobre el archivo descargado, ya que puede cambiar entre versiones.
@@ -54,11 +54,20 @@ El modelo no debe decidir automáticamente que un estudiante fracasa ni imponer 
 
 **Fuente principal:** el dataset [Student Exam Performance & Success Dataset de Kaggle](https://www.kaggle.com/datasets/mobeenfatimah/student-exam-performance-and-success-dataset).
 
-Se utilizarán las variables que realmente estén disponibles en el archivo descargado. Dependiendo del esquema, podrían incluir resultados de exámenes anteriores, calificaciones, asistencia, hábitos de estudio y características educativas o contextuales. Estas variables son ejemplos posibles y deben confirmarse contra las columnas reales del dataset.
+Las variables disponibles en el archivo (44 columnas) se agrupan así; el detalle está en [`data/README.md`](data/README.md):
 
-La variable objetivo también debe definirse de acuerdo con los datos disponibles:
-- **Clasificación:** predecir una categoría, por ejemplo, riesgo/no riesgo o aprobado/no aprobado, siempre que exista una etiqueta adecuada.
-- **Regresión:** estimar una calificación numérica, si el conjunto de datos contiene una nota como objetivo.
+- **Historial académico:** `previous_exam_score`, `previous_gpa`, `attendance_percentage`, `assignment_completion_rate`, `class_participation`.
+- **Hábitos de estudio:** `study_hours_per_day`, `self_study_hours`, `online_learning_hours`, `study_consistency`, `study_method`, `revision_frequency`, `practice_tests_completed`, `notes_quality`, `study_environment`, `private_tuition`, `exam_preparation_days`.
+- **Bienestar y recursos:** `sleep_hours`, `sleep_quality`, `stress_level`, `motivation_level`, `daily_screen_time`, `physical_activity_hours`, `break_frequency`, `internet_access`, `device_availability`, `educational_app_usage`, `online_course_hours`.
+- **Contexto (sensible):** `age`, `gender`, `school_type`, `family_income`, `parent_education`, `urban_rural`; además `education_level`.
+- **Alrededor del examen (a revisar):** `exam_difficulty`, `time_management_score`, `exam_anxiety_level`.
+- **Resultado del examen (no se usan para predecir):** `exam_score`, `pass_status` (corte en 50), `performance_grade`, `performance_level`, `questions_correct`, `questions_attempted`.
+
+**Regla de aprobación:** el estudiante **aprueba con 70 o más** y **pierde el curso con menos de 70** (69 pierde).
+
+**Variable objetivo:** `pass_70` (`Pass` 30,8 % / `Fail` 69,2 %), con `Fail` como clase de interés. Es un problema de **clasificación**: la acción (dar apoyo o no) es de sí/no. `pass_70` se deriva de `exam_score` (`Pass` si ≥ 70), por lo que la nota queda fuera de los predictores. La columna `pass_status` del dataset usa el corte de 50: **no es el objetivo** y también se excluye. `exam_score` (0–100) queda como alternativa de regresión si el grupo prefiere estimar la nota.
+
+**Partición:** `student_id` es único (100.000 ids para 100.000 filas), así que no hay estudiantes repetidos y se parte por fila, estratificado por `pass_70`.
 
 No se deben utilizar como variables predictoras datos que solo se conocen después de la decisión que se quiere anticipar, porque provocarían fuga de información (*data leakage*).
 
@@ -111,20 +120,23 @@ Las métricas deben calcularse sobre datos no utilizados para entrenar el modelo
 
 ## 10. Estructura sugerida del repositorio
 
+Estructura obligatoria del curso (detalle en `CLAUDE.md`):
+
 ```text
-student-exam-performance/
 ├── data/
-│   └── README.md              # Instrucciones para obtener los datos
-├── notebooks/
-│   └── 01_analisis_exploratorio.ipynb
-├── src/
-│   ├── preprocessing.py
-│   └── train_model.py
-├── reports/
-│   └── figures/
-├── requirements.txt
-├── .gitignore
-└── README.md
+│   ├── README.md                       # Diccionario de variables y cifras del dataset
+│   ├── student_exam_performance.csv    # Datos originales (nunca se modifican)
+│   ├── raw/  processed/                # processed/ guarda train y test
+├── notebooks/                          # 01_caso_negocio … 09_inferencia
+├── src/proyecto/                       # data/ features/ models/ tracking/ inference/
+├── tests/
+├── models/                             # model.joblib + ficha_modelo.md
+├── app/streamlit_app.py
+├── reports/                            # 00_caso … 09_despliegue + informe_tecnico.md
+├── especificaciones/                   # 02-eda.md, 03-preprocesamiento.md
+├── especificacion-proyecto.md          # Caso, objetivo, métrica y decisiones
+├── presentacion/ejecutiva.md
+├── requirements.txt  .env.example  .gitignore  README.md  CLAUDE.md
 ```
 
 Se recomienda no subir al repositorio datos personales o archivos cuya licencia no permita su redistribución. Si el CSV es voluminoso o tiene restricciones, incluir instrucciones para descargarlo desde Kaggle en lugar de versionarlo.

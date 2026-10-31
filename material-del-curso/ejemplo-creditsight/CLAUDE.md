@@ -78,3 +78,10 @@ material-del-curso/ejemplo-creditsight/
 2. Haz el cambio.
 3. Dime cómo comprobar que funciona (el comando exacto) y qué resultado debería ver.
 4. Si hay un riesgo (fuga de información, datos personales, métrica engañosa), avísame.
+
+---
+
+<!-- contexto-dataset -->
+## Aplicación a este proyecto (dataset de rendimiento estudiantil)
+
+Este archivo es el **ejemplo de otro caso (CreditSight)**; no se adapta a este proyecto. Úsalo solo como modelo de redacción. Los documentos equivalentes de este proyecto están en la raíz del repositorio: `CLAUDE.md`, `README.md`, `especificacion-proyecto.md`, `reports/00_caso.md`, `reports/01_eda.md` y `reports/06_optimizacion.md`, con el dataset de rendimiento estudiantil (objetivo `pass_70`: se aprueba con 70 o más; ver `data/README.md`).

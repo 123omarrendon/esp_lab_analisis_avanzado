@@ -101,3 +101,10 @@ con el EDA.
   (3) medir el modelo con y sin `Credit_Mix`, porque podría reflejar casi directamente el objetivo
   (hipótesis a probar, no afirmada); (4) limpiar valores basura en columnas numéricas que llegan como
   texto.
+
+---
+
+<!-- contexto-dataset -->
+## Aplicación a este proyecto (dataset de rendimiento estudiantil)
+
+La ficha de este proyecto está en [`reports/00_caso.md`](../../reports/00_caso.md), con estado `borrador`. Resumen: `case_id` = `rendimiento-estudiantil`; 100.000 filas, 44 columnas; `target` = `pass_70` (nota ≥ 70 aprueba; < 70 pierde el curso); clasificación; métricas principales = costo por estudiante, *recall* de `Fail` y NPV.

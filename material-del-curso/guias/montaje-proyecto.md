@@ -361,3 +361,10 @@ los comandos y los subagentes, y los cambios están en un commit y subidos.
 
 Más ayuda: `instalacion.md` (errores de instalación), `databricks-mlflow.md` (conexión y cuota) y
 `git-github-basico.md` (Git).
+
+---
+
+<!-- contexto-dataset -->
+## Aplicación a este proyecto (dataset de rendimiento estudiantil)
+
+Datos de este proyecto: el CSV está hoy en `data/student_exam_performance.csv`. La estructura del curso pide los originales en `data/raw/` (intocables); si el grupo lo mueve, actualizar las rutas en `especificaciones/03-preprocesamiento.md` y en `scripts/verificar_entorno.py` (que avisa si `data/raw` está vacía).

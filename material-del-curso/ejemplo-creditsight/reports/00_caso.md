@@ -53,3 +53,10 @@
   (3) medir el modelo con y sin `Credit_Mix`, porque podría reflejar casi directamente el objetivo
   (hipótesis a probar, no afirmada); (4) limpiar valores basura en columnas numéricas que llegan como
   texto.
+
+---
+
+<!-- contexto-dataset -->
+## Aplicación a este proyecto (dataset de rendimiento estudiantil)
+
+Este archivo es el **ejemplo de otro caso (CreditSight)**; no se adapta a este proyecto. Úsalo solo como modelo de redacción. Los documentos equivalentes de este proyecto están en la raíz del repositorio: `CLAUDE.md`, `README.md`, `especificacion-proyecto.md`, `reports/00_caso.md`, `reports/01_eda.md` y `reports/06_optimizacion.md`, con el dataset de rendimiento estudiantil (objetivo `pass_70`: se aprueba con 70 o más; ver `data/README.md`).

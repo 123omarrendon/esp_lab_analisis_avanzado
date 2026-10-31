@@ -22,7 +22,7 @@ resultado con `checklist-revision-ia.md` antes de continuar.
 ## 2. EDA
 **Antes de pedir nada:** abre `guia-eda-y-preprocesamiento.md` y define tu **ID_COL** (la columna que identifica a la entidad) y tu **TARGET**.
 
-**Prompt 1 (plan, sin código):** "Lee `especificacion-proyecto.md` y mira `data/raw/<archivo>.csv` sin imprimir columnas con datos personales. Dime en 5 viñetas qué revisarías en el EDA siguiendo las 5 preguntas de `kit-estudiante/guia-eda-y-preprocesamiento.md` (unidad de análisis, objetivo, suciedad, variables que deberían ser estables, sospecha de fuga). No escribas código todavía."
+**Prompt 1 (plan, sin código):** "Lee `especificacion-proyecto.md` y mira `data/student_exam_performance.csv` sin imprimir columnas con datos personales. Dime en 5 viñetas qué revisarías en el EDA siguiendo las 5 preguntas de `kit-estudiante/guia-eda-y-preprocesamiento.md` (unidad de análisis, objetivo, suciedad, variables que deberían ser estables, sospecha de fuga). No escribas código todavía."
 
 **Prompt 2 (una pregunta por vez):** "En `notebooks/02_eda.ipynb`, sección `<1, 2, 3, 4 o 5>`, completa la celda de código para mi dataset (ID_COL=`<columna>`, TARGET=`<columna>`). Usa pandas, muestra cifras y no cambies otras secciones. Dime cómo reproducir cada porcentaje."
 
@@ -45,7 +45,7 @@ resultado con `checklist-revision-ia.md` antes de continuar.
 
 **Prompt 1 (una decisión):** "Del `reports/01_eda.md`, decisión número `<n>`: `<pega la decisión>`. Escribe en `src/proyecto/data/cleaning.py` una función pequeña que la implemente, con docstring en español. Añade una prueba en `tests/test_cleaning.py` con un ejemplo mínimo hecho a mano (el caso normal y el caso sucio). No toques otras funciones."
 
-**Prompt 2 (la función que une todo):** "En `src/proyecto/data/cleaning.py`, crea `clean(df)` que aplique en orden las funciones ya escritas y devuelva un `DataFrame` con el **mismo número de filas** que la entrada. Elimina las columnas personales `<lista>` al cargar los datos. No modifiques nada de `data/raw/`."
+**Prompt 2 (la función que une todo):** "En `src/proyecto/data/cleaning.py`, crea `clean(df)` que aplique en orden las funciones ya escritas y devuelva un `DataFrame` con el **mismo número de filas** que la entrada. Elimina las columnas personales `<lista>` al cargar los datos. No modifiques nada de `data/student_exam_performance.csv`."
 
 **Prompt 3 (partición por la unidad de análisis):** "En `src/proyecto/data/split.py`, escribe `split_by_group(df, group_col, test_size, seed)` con `GroupShuffleSplit`, partiendo por `<unidad>`. Añade en `tests/test_split.py` una prueba con `assert` de que **ninguna entidad aparece en entrenamiento y prueba a la vez**. Después demuéstrame que esa prueba **falla** si se parte por fila con `train_test_split`."
 
@@ -56,7 +56,7 @@ resultado con `checklist-revision-ia.md` antes de continuar.
 **Cómo revisarlo (con la guía y `checklist-revision-ia.md`):**
 - `pytest -q` en **verde**.
 - La prueba de partición **falla** si parto por fila (compruébalo: una prueba que no puede fallar no protege nada).
-- `data/raw/` **no cambió** (`git status` no lo muestra modificado).
+- `data/student_exam_performance.csv` **no cambió** (`git status` no lo muestra modificado).
 - ¿Hay alguna estadística de **todo el dataset** (media, mediana, categorías) calculada antes de partir? Eso va dentro del pipeline, no en la limpieza.
 - ¿Puedo explicar **cada línea** de las funciones? Si no, pídele que la explique antes de aceptarla.
 - ¿Los datos personales quedaron **fuera** del `DataFrame` limpio?
@@ -170,3 +170,26 @@ resultado con `checklist-revision-ia.md` antes de continuar.
 **Prompt:** "En `presentacion/ejecutiva.md` (Marp), escribe **máximo 5 diapositivas**: problema, enfoque, resultado y costo de negocio, demo de la app, riesgos y siguientes pasos. Lenguaje sin jerga."
 **Qué esperar:** cinco diapositivas claras, una idea por diapositiva.
 **Cómo revisarlo:** ¿son 5 o menos? ¿un directivo entendería el resultado y el riesgo en 1 minuto?
+
+---
+
+<!-- contexto-dataset -->
+## Aplicación a este proyecto (dataset de rendimiento estudiantil)
+
+Valores para rellenar los `<...>` de los prompts con este proyecto:
+
+| Marcador | Valor |
+|---|---|
+| `<archivo>.csv` / ruta de datos | `data/student_exam_performance.csv` (si se mueve, `data/raw/student_exam_performance.csv`) |
+| `ID_COL` | `student_id` (no se repite) |
+| `TARGET` | `pass_70` (derivado de `exam_score`: `Pass` si ≥ 70, `Fail` si < 70; clase de interés `Fail`). `pass_status` del dataset usa el corte de 50: no es el objetivo |
+| Métricas principales / de negocio | costo por estudiante (5 a 1), *recall* de `Fail` y NPV |
+| Controles | precisión de `Fail` (> 69,2 %), F1 y F2, PR-AUC, alertas por 100 |
+| Columnas personales a quitar al cargar | `student_id` (pasa al índice), `gender` y `family_income` (se guardan aparte para auditar) |
+| Columnas de fuga a excluir | `exam_score`, `pass_status`, `performance_grade`, `performance_level`, `questions_correct`, `questions_attempted` (el objetivo se crea **antes** de quitar `exam_score`) |
+
+**Adaptaciones obligatorias:**
+- **Prompt 3 de Preprocesamiento (partición):** no uses `GroupShuffleSplit`. Pide `train_test_split(..., stratify=pass_70, test_size=0.2, random_state=42)` en `split_train_test(df, target, test_size, seed)` y una prueba de que no se pierde ninguna fila y de que la proporción de `Fail` es ≈ 69,2 % en ambos lados.
+- **Prompt 2 de Features, Torneo y Optimización (pliegues):** usa `StratifiedKFold` por fila en lugar de `StratifiedGroupKFold` o `GroupKFold`.
+- **Prompt 3 de Optimización (reservado):** `train_test_split` estratificado, no `GroupShuffleSplit`.
+- **Prompt 5 de Optimización:** el intervalo del 95 % remuestrea filas.

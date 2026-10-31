@@ -170,3 +170,10 @@ Borra la carpeta `.venv` y crea el entorno otra vez con `uv venv --python 3.12`.
 ### Se me agotó la cuota de Databricks
 Free Edition tiene cuota diaria de cómputo. Si se agota, espera al día siguiente o usa MLflow
 local como respaldo (la guía `databricks-mlflow.md` lo explica).
+
+---
+
+<!-- contexto-dataset -->
+## Aplicación a este proyecto (dataset de rendimiento estudiantil)
+
+Estado observado el 2026-10-30 al correr `python scripts/verificar_entorno.py` en WSL: Python 3.10 (el curso pide 3.12); entorno virtual sin activar; **FALTA** instalar scikit-learn, mlflow, streamlit, joblib, pytest y python-dotenv; **FALTA** el archivo `.env`; `data/raw` vacía. Pasos: `uv venv --python 3.12`, `uv pip install -r requirements.txt`, copiar `.env.example` a `.env` y volver a correr el verificador.

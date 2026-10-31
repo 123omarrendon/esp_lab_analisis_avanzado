@@ -10,9 +10,9 @@ footer: "Casos Avanzados · Maestría en Ingeniería Analítica"
 
 <!-- TODO: borra las instrucciones de cada diapositiva y escribe lo tuyo. MÁXIMO 5 DIAPOSITIVAS: no agregues una sexta. -->
 
-- **¿Quién decide?** TODO
-- **¿Qué decide con el resultado?** TODO
-- **¿Cuánto cuesta equivocarse** (y si cuesta distinto en cada dirección)? TODO
+- **¿Quién decide?** El/la coordinador(a) académico(a)
+- **¿Qué decide con el resultado?** A qué estudiantes ofrecer tutoría o refuerzo antes del examen final
+- **¿Cuánto cuesta equivocarse** (y si cuesta distinto en cada dirección)? Sí cuesta distinto: no avisar a quien perderá el curso (nota menor que 70) es peor que ofrecer una tutoría que no hacía falta. TODO: cifra en unidades de negocio
 
 > TODO: un titular que entienda alguien sin formación técnica. **No abras con el nombre del algoritmo.**
 
@@ -22,8 +22,8 @@ footer: "Casos Avanzados · Maestría en Ingeniería Analítica"
 
 <!-- TODO: una frase por idea. Lo técnico va al informe, no aquí. -->
 
-- **Los datos:** TODO (de dónde vienen y cuántos)
-- **Cómo se validó con honestidad:** TODO (por qué tu partición respeta la unidad de análisis)
+- **Los datos:** dataset público de Kaggle con 100.000 estudiantes y 44 variables; se aprueba con 70 o más y 69,2 % no llegó a 70
+- **Cómo se validó con honestidad:** cada fila es un estudiante distinto, así que se parte por fila, con la misma proporción de reprobados en entrenamiento y prueba; se quitaron las variables que ya contienen la nota del examen
 - **Qué se comparó y qué se eligió:** TODO
 - **Qué se descartó y por qué:** TODO (si una idea no funcionó, dilo: da credibilidad)
 

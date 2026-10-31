@@ -25,6 +25,8 @@
 
 ## 3. Pruebas del enlace público
 
+> Casos de entrada inválida que la app debe rechazar, según los rangos del dataset (`data/README.md`): `age` fuera de 14–20, `attendance_percentage` o `previous_exam_score` fuera de 0–100, `previous_gpa` fuera de 1–4, `sleep_hours` fuera de 0–24, horas de estudio negativas. La app debe avisar que el resultado es una alerta para revisión humana, no una decisión automática.
+
 | Caso | Datos usados | Resultado esperado | Resultado real |
 |---|---|---|---|
 | Normal | | | |

@@ -15,7 +15,7 @@
 | | | |
 
 - **Presupuesto** (ensayos por modelo, fijado antes de empezar) y **por qué ese número:**
-- **Entidades reservadas** (qué porcentaje, partidas por qué entidad, semilla):
+- **Entidades reservadas** (qué porcentaje, partidas por qué entidad, semilla): se reserva por fila, estratificado por `pass_70` (cada fila es un estudiante distinto). Porcentaje: por definir; semilla 42. El intervalo del 95 % remuestrea filas.
 
 ## Seguimiento (tracking)
 

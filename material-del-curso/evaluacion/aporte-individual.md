@@ -48,3 +48,16 @@ Señales objetivas, no opiniones:
 - Avisar al instructor antes del cierre de la clase 4 (jueves 5 de noviembre), para reasignar tareas.
 - Quien no aporte recibe nota individual baja en el criterio D, sin afectar la nota del grupo en
   los criterios A–C.
+
+---
+
+<!-- contexto-dataset -->
+## Aplicación a este proyecto (dataset de rendimiento estudiantil)
+
+Decisiones técnicas de este proyecto que **cada integrante debería poder explicar** (con su cifra) en una pregunta del instructor:
+
+1. Por qué se excluyen `exam_score`, `pass_status`, `performance_grade`, `performance_level`, `questions_correct` y `questions_attempted` (el objetivo `pass_70` sale de la nota: Pass si ≥ 70; `pass_status` es la misma respuesta con corte en 50).
+2. Por qué se parte por fila y estratificado (`student_id` es único) y no por grupo.
+3. Por qué se evalúa con costo, *recall* de `Fail` y NPV, y no con la exactitud (con 69,2 % de `Fail`, «avisar a todos» ya acierta 69,2 % y cuesta 0,31, la estrategia a vencer).
+4. Qué se hace con los vacíos de 7 columnas y por qué no se borran filas.
+5. Por qué `gender` no entra como predictor y cómo se audita la equidad.

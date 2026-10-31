@@ -65,3 +65,26 @@ Si dudas de si un dataset es "el mismo" con otro nombre, pregunta al instructor.
 - [ ] No está en la lista prohibida.
 - [ ] No tiene datos personales ni confidenciales; revisé la licencia.
 - [ ] Ninguna columna contiene la respuesta.
+
+---
+
+<!-- contexto-dataset -->
+## Aplicación a este proyecto (dataset de rendimiento estudiantil)
+
+Autoevaluación del dataset elegido (*Student Exam Performance & Success*, Kaggle) frente a los criterios. Cifras medidas el 2026-10-30.
+
+| # | Criterio | Estado | Evidencia |
+|---|---|---|---|
+| 1 | Volumen | Cumple | 100.000 filas × 44 columnas |
+| 2 | Mezcla de tipos | Cumple en parte | 22 numéricas y 22 categóricas/texto; sin fechas ni alta cardinalidad |
+| 3 | Suciedad real | Débil | Solo vacíos en 7 columnas (3,0 %–9,9 %); 0 duplicados, 0 valores imposibles. Confirmar con el instructor |
+| 4 | Objetivo definido | Cumple | `pass_70`, derivado de `exam_score` con el corte en 70 (clasificación; `Fail` 69,2 %) |
+| 5 | Unidad de análisis | Cumple | Un estudiante por fila; `student_id` único |
+| 6 | Decisión con costo | Cumple | No avisar a quien pierde el curso (falso negativo) cuesta más que una tutoría innecesaria (supuesto 5 a 1) |
+| 7 | No repetido | Cumple | No figura en la lista prohibida |
+| 8 | Sin datos personales | Cumple en parte | Sin nombres ni documentos; hay `age` (incluye menores) y atributos demográficos |
+| 9 | Sin información confidencial | Cumple | Dataset público |
+| 10 | Licencia revisada | **Pendiente** | Verificar en la página de Kaggle; el CSV pesa ~25 MB |
+| 11 | Sin fuga evidente | Cumple con acción | Hay 6 columnas con la respuesta, incluida `pass_status` (corte en 50); se excluyen (ver `data/README.md`) |
+
+Además: hay indicios de que el dataset es sintético (varias variables con correlación ≈ 0 con la nota). Declararlo como límite.

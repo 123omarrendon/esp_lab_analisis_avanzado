@@ -43,3 +43,10 @@ El aporte individual se evalúa aparte (criterio D); la exposición no sustituye
 - Abran la app desde el enlace público en un navegador distinto al de desarrollo.
 - Tengan lista una captura de la app funcionando, por si falla la conexión.
 - No lean las diapositivas: cuenten la decisión y el resultado.
+
+---
+
+<!-- contexto-dataset -->
+## Aplicación a este proyecto (dataset de rendimiento estudiantil)
+
+Mensaje central para no técnicos: se aprueba con 70 o más y de cada 100 estudiantes unos 69 no llegan a 70; el modelo busca ordenar a los estudiantes por riesgo para que reciba apoyo quien más lo necesita, porque no se puede ayudar a todos. Costo asimétrico: no avisar a quien pierde el curso es peor que una tutoría innecesaria. Riesgos a nombrar: el resultado es una alerta para revisión humana, no una sanción; `gender` y otros atributos sensibles no deciden; el dataset parece sintético. Cifras del resultado: solo las de `reports/07_validacion.md`.

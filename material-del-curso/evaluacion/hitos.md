@@ -58,3 +58,17 @@ torneo, optimización, validación, registro, despliegue), con cada decisión ju
 - Cada decisión de datos queda escrita con su motivo, no solo el código.
 - Los cambios de datos y de unidad de análisis se documentan en el informe.
 - El instructor revisa cada hito y responde con "aprobado" o "devuelto" y observaciones concretas.
+
+---
+
+<!-- contexto-dataset -->
+## Aplicación a este proyecto (dataset de rendimiento estudiantil)
+
+Estado de este proyecto (2026-10-30), según los documentos del repositorio:
+
+| Hito | Hecho | Pendiente |
+|---|---|---|
+| H1 | `reports/00_caso.md`, `especificaciones/02-eda.md`, `especificaciones/03-preprocesamiento.md` y `reports/01_eda.md` en borrador con cifras reales | Aprobación de la ficha; correr `notebooks/02_eda.ipynb`; código de `src/proyecto/data/` con pruebas; confirmar las decisiones en grupo |
+| H2 | — | Torneo, optimización con tracking, modelo registrado, app local |
+| H3 | — | App desplegada y presentación (≤ 5 diapositivas) |
+| H4 | — | Informe técnico completo |

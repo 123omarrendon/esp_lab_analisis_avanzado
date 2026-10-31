@@ -80,3 +80,10 @@ Si algo no se puede comprobar con la evidencia, el nivel es el inferior.
 - **Resuman, no copien:** si una sección es una tabla del notebook sin comentario, falta el motivo.
 - **Cuenten también lo que no funcionó** (una variable descartada, una optimización sin mejora): eso demuestra criterio.
 - **Entreguen un día antes:** el domingo no hay margen para un error de Git.
+
+---
+
+<!-- contexto-dataset -->
+## Aplicación a este proyecto (dataset de rendimiento estudiantil)
+
+Decisiones de este proyecto que el informe debe mostrar, **cada una con cifra y motivo**: el objetivo `pass_70` (aprueba con 70 o más) frente al `pass_status` del dataset (corte 50); exclusión de las 6 columnas de fuga; partición por fila estratificada; métricas costo, *recall* de `Fail` y NPV frente a la línea base «avisar a todos» (costo 0,31, exactitud 69,2 %); tratamiento de los vacíos de 7 columnas; tratamiento de `gender` y auditoría de equidad por grupo; límites del dataset (posible origen sintético, sin dimensión temporal). Fuentes: `reports/01_eda.md` y `data/README.md`.

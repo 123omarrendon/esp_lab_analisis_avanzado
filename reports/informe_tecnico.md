@@ -16,15 +16,15 @@ principal límite y el enlace a la app. *(La conclusión primero.)*
 
 > Fuente: `reports/00_caso.md` (ficha de caso aprobada).
 
-TODO: quién decide, qué decide, con qué información, qué cuesta equivocarse y cómo se midió el éxito.
+El/la coordinador(a) académico(a) decide qué estudiantes reciben tutoría o refuerzo antes del examen final. Se usan los hábitos de estudio, la asistencia, el historial académico y el contexto de cada estudiante (dataset de Kaggle, 100.000 estudiantes, 44 columnas). Se aprueba con **70 o más**; con menos de 70 el estudiante pierde el curso. El modelo clasifica `pass_70` y busca detectar a quienes perderán el curso (`Fail`, 69,2 %). Equivocarse no cuesta lo mismo: no avisar a quien pierde el curso (falso negativo) es peor que ofrecer una tutoría innecesaria (falso positivo; supuesto 5 a 1). El éxito se mide con el costo por estudiante, el *recall* de `Fail` y el NPV frente a la estrategia sin modelo a vencer, «avisar a todos» (costo 0,31): un modelo la supera solo con NPV > 83,3 %. TODO: costos exactos y capacidad de tutoría acordados con la institución.
 
 ## 2. Datos y limpieza
 
 > Fuente: `reports/01_eda.md` y `src/<paquete>/data/`.
 
-- **Unidad de análisis y partición** (y por qué respeta la entidad que se repite): TODO
-- **Hallazgos y decisiones** (cada una con su motivo): TODO
-- **Datos personales o sensibles y cómo se trataron:** TODO
+- **Unidad de análisis y partición** (y por qué respeta la entidad que se repite): una fila es un estudiante y `student_id` es único (100.000 ids), por lo que se parte por fila, estratificado por `pass_70`, 80/20 y semilla 42.
+- **Hallazgos y decisiones** (cada una con su motivo): ver `reports/01_eda.md`. Las principales: se crea `pass_70` desde `exam_score` y se quitan `exam_score`, `pass_status` (corte en 50), `performance_grade`, `performance_level`, `questions_correct` y `questions_attempted` por fuga; no se borran filas con vacíos (7 columnas, 3,0 %–9,9 %), se resuelven dentro del `Pipeline`. TODO: completar cuando el grupo apruebe las decisiones.
+- **Datos personales o sensibles y cómo se trataron:** sin nombres ni documentos. `student_id` se excluye; `gender` y `family_income` (brecha de 15 puntos en `Fail`) no entran como predictores y se usan para auditar equidad; `age` (14–20, incluye menores), `family_income`, `parent_education`, `urban_rural` y `school_type` se tratan como sensibles. TODO: decisión final del grupo.
 
 ## 3. Variables
 
