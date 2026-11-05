@@ -144,11 +144,16 @@ def candidates(random_state: int = RANDOM_STATE) -> dict:
     }
 
 
-def metrics_from_proba(y_fail, p_fail) -> dict:
-    """Todas las métricas de un conjunto de predicciones: la decisión de negocio y las que usan solo las probabilidades."""
+def metrics_from_proba(y_fail, p_fail, threshold: float | None = None) -> dict:
+    """Todas las métricas de un conjunto de predicciones: la decisión de negocio y las que usan solo las probabilidades.
+
+    `threshold` es la P(Fail) desde la cual se avisa. Por defecto es la de los costos del caso (1 / 6 = 0,167); la
+    etapa 6 lo puede ajustar con validación. ROC-AUC, PR-AUC y *log loss* no dependen del umbral.
+    """
     y_fail = np.asarray(y_fail).astype(int)
     p_fail = np.asarray(p_fail, dtype=float)
-    out = business_metrics(y_fail, decide_alert(p_fail))
+    alert = p_fail >= (decision_threshold() if threshold is None else threshold)
+    out = business_metrics(y_fail, alert)
     out["cost_argmax"] = business_metrics(y_fail, p_fail >= 0.5)["cost"]     # con la «clase más probable», sin costos
     for k in TOP_K_PERCENTS:                                                 # si solo se puede avisar al k % más riesgoso
         m_k = business_metrics(y_fail, top_k_alert(p_fail, k))
@@ -179,11 +184,11 @@ def build_pipeline(
     return Pipeline(steps)
 
 
-def evaluate_folds(pipeline, X: pd.DataFrame, y_fail, folds) -> pd.DataFrame:
+def evaluate_folds(pipeline, X: pd.DataFrame, y_fail, folds, threshold: float | None = None) -> pd.DataFrame:
     """Valida con los pliegues dados. Una fila por pliegue con todas las métricas y el tiempo de ajuste.
 
     `folds` es la lista de (índices de entrenamiento, índices de validación) de `make_folds`: los mismos para todas
-    las variantes que se comparen. La prueba (`test.joblib`) no interviene.
+    las variantes que se comparen. La prueba (`test.joblib`) no interviene. `threshold`: ver `metrics_from_proba`.
     """
     if TARGET in X.columns:
         raise ValueError(f"X no debe incluir el objetivo '{TARGET}'.")
@@ -195,5 +200,5 @@ def evaluate_folds(pipeline, X: pd.DataFrame, y_fail, folds) -> pd.DataFrame:
         model.fit(X.iloc[train_idx], y_fail[train_idx])
         seconds = time.time() - start
         p_fail = model.predict_proba(X.iloc[valid_idx])[:, 1]
-        rows.append({"fold": fold, **metrics_from_proba(y_fail[valid_idx], p_fail), "fit_seconds": seconds})
+        rows.append({"fold": fold, **metrics_from_proba(y_fail[valid_idx], p_fail, threshold), "fit_seconds": seconds})
     return pd.DataFrame(rows).set_index("fold")

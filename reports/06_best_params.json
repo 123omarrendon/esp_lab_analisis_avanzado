@@ -1,0 +1,32 @@
+{
+  "modelo": "regresión logística",
+  "decision": "parámetros de partida (la mejora no se distingue del ruido)",
+  "parametros": {
+    "C": 1.0,
+    "threshold": 0.16666666666666666
+  },
+  "optimizados": {
+    "C": 0.03757060314666423,
+    "threshold": 0.16664263996144713
+  },
+  "partida": {
+    "C": 1.0,
+    "threshold": 0.16666666666666666
+  },
+  "costo_busqueda_optimista": 0.2582166666666667,
+  "costo_reservados": {
+    "partida": 0.25475,
+    "optimizado": 0.25485,
+    "avisar_a_todos": 0.3079
+  },
+  "diferencia_costo": {
+    "valor": 0.0001,
+    "intervalo_95": [
+      -0.00135,
+      0.001351249999999999
+    ]
+  },
+  "ensayos": 25,
+  "mlflow_parent_run_id": "f54da878a2c447fab7e1cf799a25bde7",
+  "tracking": "local"
+}

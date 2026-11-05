@@ -42,8 +42,7 @@ Se compararon 5 modelos (regresión logística, KNN de 5 vecinos, random forest,
 
 > Fuente: `reports/06_optimizacion.md`.
 
-TODO: espacio de búsqueda, presupuesto, comprobación con datos reservados (¿la mejora fue real o está dentro del ruido?) y qué se
-registró en el seguimiento (Databricks o MLflow local).
+Se optimizó solo el modelo ganador del torneo, la **regresión logística** (`notebooks/06b_optimizacion_aprueba_o_no.ipynb`, `src/proyecto/models/tuning.py`). Espacio: `C` (0,001 a 100, escala logarítmica) y el umbral de decisión (0,05 a 0,40). Presupuesto: 25 ensayos con Optuna, cada uno registrado como ejecución anidada en **MLflow local** (25 de 25). Se reservó el 25 % de los estudiantes (20.000) que la búsqueda no vio. **Resultado: la optimización no mejora**: diferencia de costo (optimizado − partida) de +0,0001, intervalo del 95 % [−0,00135; +0,00135], que cruza el cero. Por la regla escrita antes de mirar, **se mantienen los parámetros de partida** (`C = 1`, umbral 1/6 ≈ 0,167). El umbral que encontró la búsqueda (0,1666) coincide con el teórico, lo que sugiere probabilidades razonablemente calibradas (se confirma en la etapa 7). Detalle en `reports/06_optimizacion.md`. TODO: aprobación del grupo.
 
 ## 6. Validación e interpretación
 

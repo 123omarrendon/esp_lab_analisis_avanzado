@@ -184,3 +184,25 @@ def test_dummy_regressor_costs_the_same_as_the_baseline():
         model, _ = candidates()[name]
         costs[name] = metrics_from_proba(y, build_pipeline(model).fit(X, y).predict_proba(X)[:, 1])["cost"]
     assert costs["línea base (avisar a todos)"] == pytest.approx(costs["dummy regressor (media)"])
+
+
+def test_threshold_changes_who_gets_alerted_and_the_cost():
+    y = np.array([1, 1, 0, 0])
+    p = np.array([0.30, 0.30, 0.10, 0.10])
+    default = metrics_from_proba(y, p)                 # umbral 1/6: avisa a los 2 que pierden
+    strict = metrics_from_proba(y, p, threshold=0.5)   # umbral 0,5: no avisa a nadie
+    assert default["alerts_per_100"] == 50 and default["cost"] == 0
+    assert strict["alerts_per_100"] == 0 and strict["cost"] == pytest.approx(5 * 2 / 4)
+    assert strict["roc_auc"] == default["roc_auc"]     # el ranking no depende del umbral
+
+
+def test_evaluate_folds_passes_the_threshold_to_every_fold():
+    X, y = _toy_xy()
+    folds = make_folds(pd.Series(y), n_splits=3)
+    res = evaluate_folds(build_pipeline(DummyClassifier(strategy="prior")), X, y, folds, threshold=0.99)
+    assert (res["alerts_per_100"] == 0).all()
+
+
+def test_a_probability_exactly_at_the_threshold_gets_an_alert():
+    m = metrics_from_proba(np.array([1, 0]), np.array([0.3, 0.1]), threshold=0.3)    # 0,3 >= 0,3: se avisa
+    assert m["alerts_per_100"] == 50 and m["tp"] == 1

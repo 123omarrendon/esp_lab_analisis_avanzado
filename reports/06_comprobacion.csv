@@ -1,0 +1,9 @@
+,partida,optimizado
+C,1.0,0.03757
+umbral,0.16667,0.16664
+costo,0.25475,0.25485
+log loss,0.37369,0.37363
+ROC-AUC,0.89175,0.89182
+recall Fail,0.9888,0.98931
+NPV,0.92223,0.92406
+alertas por 100,90.035,90.255
