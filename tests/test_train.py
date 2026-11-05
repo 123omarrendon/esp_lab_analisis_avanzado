@@ -11,7 +11,7 @@ from sklearn.linear_model import LogisticRegression
 
 from proyecto.data.split import make_folds
 from proyecto.models.train import (
-    build_pipeline, business_metrics, candidates, decide_alert, decision_threshold, encode_target, evaluate_folds,
+    MeanProbabilityRegressor, build_pipeline, business_metrics, candidates, decide_alert, decision_threshold, encode_target, evaluate_folds,
     metrics_from_proba, top_k_alert,
 )
 from toy import make_students
@@ -141,11 +141,22 @@ def test_metrics_from_proba_includes_top_k_and_argmax_cost():
     assert m["cost"] == pytest.approx(0.6)            # con p >= 1/6 avisa a 3 (VP = 2, FN = 1, FP = 1) -> 6 / 10
 
 
-def test_candidates_have_a_baseline_and_the_four_models_and_are_reproducible():
+def test_candidates_have_two_baselines_and_five_models():
     c = candidates()
-    assert list(c)[0].startswith("línea base") and len(c) == 5
+    assert list(c)[0].startswith("línea base") and list(c)[1].startswith("dummy regressor") and len(c) == 7
     assert all(hasattr(model, "fit") for model, _ in c.values())
-    assert c["regresión logística"][1] is True and c["random forest"][1] is False   # solo el lineal pide escalar
+    assert c["regresión logística"][1] is True and c["knn (5 vecinos)"][1] is True   # lineal y distancias piden escalar
+    assert c["random forest"][1] is False
+    assert c["knn (5 vecinos)"][0].n_neighbors == 5
+
+
+def test_mean_probability_regressor_predicts_the_fail_rate_for_everybody():
+    X, y = _toy_xy()
+    model = MeanProbabilityRegressor().fit(X, y)
+    p = model.predict_proba(X)
+    assert p.shape == (60, 2) and np.allclose(p.sum(axis=1), 1)
+    assert np.allclose(p[:, 1], y.mean())                                   # la media de 0/1 es la tasa de Fail
+    assert decide_alert(p[:, 1]).all()                                      # con umbral 1/6 avisa a todos: no discrimina
 
 
 def test_baseline_is_alert_everyone_and_costs_the_fail_rate_complement():
@@ -164,3 +175,12 @@ def test_top_k_precision_and_recall_are_not_mixed_up():
     assert m["precision_top30"] == pytest.approx(1.0)                      # 3 de 3 alertas acertaron
     assert m["recall_top30"] == pytest.approx(0.75)                        # se detectó a 3 de los 4 que pierden
     assert m["cost_top30"] == pytest.approx(5 * 1 / 10)                    # un falso negativo cuesta 5, de 10 estudiantes
+
+
+def test_dummy_regressor_costs_the_same_as_the_baseline():
+    X, y = _toy_xy()
+    costs = {}
+    for name in ["línea base (avisar a todos)", "dummy regressor (media)"]:
+        model, _ = candidates()[name]
+        costs[name] = metrics_from_proba(y, build_pipeline(model).fit(X, y).predict_proba(X)[:, 1])["cost"]
+    assert costs["línea base (avisar a todos)"] == pytest.approx(costs["dummy regressor (media)"])

@@ -13,10 +13,11 @@ import time
 import numpy as np
 import pandas as pd
 from lightgbm import LGBMClassifier
-from sklearn.base import clone
-from sklearn.dummy import DummyClassifier
+from sklearn.base import BaseEstimator, ClassifierMixin, clone
+from sklearn.dummy import DummyClassifier, DummyRegressor
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
+from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import average_precision_score, log_loss, roc_auc_score
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import FunctionTransformer
@@ -96,15 +97,42 @@ def top_k_alert(p_fail, k_percent: float) -> np.ndarray:
     return alert
 
 
+class MeanProbabilityRegressor(ClassifierMixin, BaseEstimator):
+    """Usa un `DummyRegressor` (predice la media del objetivo 0/1) como si fuera un clasificador.
+
+    La media de `Fail` es la tasa de `Fail` (69,2 %): se devuelve como P(Fail) de **todos** los estudiantes. Con el
+    umbral de 0,167 avisa a todos, igual que la línea base. Sirve para comprobar, con números, si un regresor
+    constante aporta algo (no aporta: no mira ninguna variable).
+    """
+
+    def __init__(self, strategy: str = "mean"):
+        self.strategy = strategy
+
+    def fit(self, X, y):
+        self.classes_ = np.array([0, 1])
+        self.regressor_ = DummyRegressor(strategy=self.strategy).fit(X, np.asarray(y, dtype=float))
+        return self
+
+    def predict_proba(self, X):
+        p = np.clip(self.regressor_.predict(X), 0.0, 1.0)
+        return np.column_stack([1 - p, p])
+
+    def predict(self, X):
+        return (self.predict_proba(X)[:, 1] >= 0.5).astype(int)
+
+
 def candidates(random_state: int = RANDOM_STATE) -> dict:
     """Modelos del torneo: nombre -> (modelo, ¿necesita variables escaladas?).
 
-    La línea base (`DummyClassifier(prior)`) siempre predice la tasa de `Fail` (69,2 %): con el umbral de 0,167
-    equivale a «avisar a todos», la estrategia sin modelo a vencer.
+    Las dos primeras filas son referencias sin variables: `DummyClassifier(prior)` y `DummyRegressor(media)`
+    predicen siempre la tasa de `Fail` (69,2 %); con el umbral de 0,167 equivalen a «avisar a todos», la estrategia
+    sin modelo a vencer. KNN (5 vecinos) mide la distancia entre estudiantes, por eso pide variables escaladas.
     """
     return {
         "línea base (avisar a todos)": (DummyClassifier(strategy="prior"), False),
+        "dummy regressor (media)": (MeanProbabilityRegressor(strategy="mean"), False),
         "regresión logística": (LogisticRegression(max_iter=1000, random_state=random_state), True),
+        "knn (5 vecinos)": (KNeighborsClassifier(n_neighbors=5, n_jobs=4), True),
         "random forest": (
             RandomForestClassifier(n_estimators=200, min_samples_leaf=5, n_jobs=4, random_state=random_state), False),
         "lightgbm": (

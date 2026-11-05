@@ -23,7 +23,7 @@ Predecir, **antes del examen**, qué estudiantes van a **perder el curso** para 
 | `02b_eda_aprueba_o_no.ipynb` | 2 · EDA | `02_eda.ipynb` | Explora los datos y termina en una tabla de 9 decisiones, cada una con su motivo |
 | `03b_preprocesamiento_aprueba_o_no.ipynb` | 3 · Preprocesamiento | `03_preprocesamiento.ipynb` | Orquesta la limpieza, la partición 80/20 y el guardado de datos |
 | `04b_features_aprueba_o_no.ipynb` | 4 · Variables | `04_features.ipynb` y CreditSight | Mide 8 ideas de variables con los mismos pliegues |
-| `05b_torneo_aprueba_o_no.ipynb` | 5 · Torneo | `05_torneo.ipynb` y CreditSight | Compara 4 modelos y una línea base; propone 2 finalistas |
+| `05b_torneo_aprueba_o_no.ipynb` | 5 · Torneo | `05_torneo.ipynb` y CreditSight | Compara 5 modelos (incluido **KNN de 5 vecinos**) y 2 referencias sin modelo (incluido `DummyRegressor`); elige **un solo ganador** |
 
 Cada uno continúa al anterior y solo **orquesta**: la lógica vive en `src/`.
 
@@ -34,8 +34,8 @@ Cada uno continúa al anterior y solo **orquesta**: la lógica vive en `src/`.
 | `data/cleaning.py` | Carga y limpia: crea `pass_70` (`add_target`), quita las 6 columnas de fuga, marca valores imposibles, separa columnas sensibles para auditoría |
 | `data/split.py` | `split_train_test` (80/20 estratificado, semilla 42) y `make_folds` (5 pliegues por fila, estratificados) |
 | `features/engineering.py` | Lista de variables, variables nuevas (`add_features`), imputación dentro del `Pipeline` (`build_preprocessor`) |
-| `models/train.py` | Candidatos del torneo (`candidates`), `build_pipeline`, métricas de negocio (`business_metrics`), `evaluate_folds`, avisar solo al k % más riesgoso (`top_k_alert`) |
-| `tests/test_cleaning.py`, `test_split.py`, `test_features.py`, `test_train.py` (+ `toy.py`) | **66 pruebas** con casos armados a mano; todas pasan |
+| `models/train.py` | Candidatos del torneo (`candidates`: 5 modelos + 2 referencias, `MeanProbabilityRegressor` para usar un `DummyRegressor` como clasificador), `build_pipeline`, métricas de negocio (`business_metrics`), `evaluate_folds`, avisar solo al k % más riesgoso (`top_k_alert`) |
+| `tests/test_cleaning.py`, `test_split.py`, `test_features.py`, `test_train.py` (+ `toy.py`) | **68 pruebas** con casos armados a mano; todas pasan |
 
 **Pruebas que pueden fallar:** se introdujeron errores a propósito (por ejemplo `>` en vez de `>=` en el corte de 70, umbral invertido, una columna de fuga entre las variables, partir sin estratificar) y las pruebas los detectaron todos. Dos mutaciones sobrevivieron al principio y se corrigieron las pruebas.
 
@@ -94,30 +94,35 @@ Estrategias **sin modelo** con costos 5 : 1 (costo por estudiante, menor es mejo
 
 | Modelo | Costo por estudiante | Precisión de `Fail` | ROC-AUC | Especificidad |
 |---|---|---|---|---|
-| **Regresión logística** | **0,2576** | **0,760** | 0,892 | 0,299 |
+| **Regresión logística (ganador)** | **0,2576** | **0,760** | 0,892 | 0,299 |
 | XGBoost | 0,2583 | 0,759 | 0,894 | 0,296 |
 | LightGBM | 0,2584 | 0,759 | 0,894 | 0,295 |
 | Random forest | 0,2827 | 0,712 | 0,885 | 0,093 |
+| **KNN (5 vecinos)** | 0,3006 | 0,712 | 0,793 | 0,097 |
+| **`DummyRegressor` (media)** | 0,3079 | 0,692 | 0,500 | 0,000 |
 | Línea base (avisar a todos) | 0,3079 | 0,692 | 0,500 | 0,000 |
 
-## 4. ¿Qué modelo tiene mejor precisión?
+- **KNN con `n_neighbors=5`** (5 vecinos; KNN no tiene «profundidad», eso es de los árboles): es el **peor de los modelos reales**. Apenas supera a «avisar a todos» (0,3006 frente a 0,3079, ahorro de ≈ 730 unidades por 100.000 estudiantes frente a ≈ 5.030 de la logística), su *log loss* es de **1,456** (frente a 0,37: con 5 vecinos solo da probabilidades 0, 0,2, 0,4… y basta un vecino que pierda para avisar), avisa a 96,6 de cada 100 y, sin `exam_difficulty` y las otras dos variables, **cuesta más que no hacer nada** (0,3088). Pierde en los 5 pliegues contra la logística (12,9 veces el ruido).
+- **`DummyRegressor` (media):** se probó porque podía parecer útil. **No aporta nada**: predice la tasa de `Fail` (0,692) para todos, que con el umbral de 0,167 equivale a avisar a todos, y su costo es **idéntico al de la línea base en los 5 pliegues** (diferencia 0). Queda como segundo punto de referencia, no como candidato.
 
-- **Precisión de `Fail`** (de los estudiantes a quienes se avisa, cuántos de verdad pierden el curso): la **regresión logística** es la más alta, 0,760 frente a 0,759 de LightGBM y XGBoost y 0,712 de random forest. La diferencia entre los tres primeros es de 0,001: **es un empate**, no una victoria.
-- **Mejor costo:** regresión logística (0,2576), también empatada con XGBoost (0,2583) y LightGBM (0,2584): la diferencia es de 0,1 a 0,2 veces el ruido entre pliegues y ninguno gana en todos los pliegues.
-- **Mejor ordenamiento** (ROC-AUC 0,894, PR-AUC 0,950, *log loss* 0,370): LightGBM y XGBoost, por una diferencia de 0,002 sobre la logística.
-- **Random forest es el peor** y **pierde en los 5 pliegues** (7,4 a 8,5 veces el ruido). Parte de su desventaja viene de que sus probabilidades están peor calibradas para el umbral de 0,167.
-- **Precisión si solo se avisa al 30 % más riesgoso:** 98,3 % la regresión logística y 98,2 % LightGBM y XGBoost (el azar, 68,9 %). Los modelos **ordenan casi perfecto a los más riesgosos**.
+## 4. ¿Qué modelo gana y cuál tiene mejor precisión?
 
-**Finalistas propuestos: regresión logística y LightGBM.** La logística gana por simplicidad e interpretabilidad (cada variable tiene un peso explicable) y es la más rápida (0,6 s); LightGBM tiene el mejor ordenamiento y será el rival que ella tiene que batir tras optimizar. Si no supera a la logística, se queda la logística. **El torneo elige finalistas, no un campeón.**
+**Modelo ganador: regresión logística** (un solo ganador, como se pidió).
 
-> Una observación: que la regresión logística iguale a los modelos de boosting sugiere que las relaciones con `Fail` son casi lineales (hipótesis; el dataset parece sintético).
+- **Cómo se eligió (regla escrita antes de correr):** gana el de menor costo; si hay empate (diferencia / ruido < 1 y sin ganar en todos los pliegues), gana el más simple e interpretable. La logística tiene el menor costo (0,2576) y **empata** con XGBoost (0,2583) y LightGBM (0,2584): diferencias de 0,1 a 0,2 veces el ruido, y gana solo en 3 de 5 pliegues contra cada uno. Se desempata por simplicidad e interpretabilidad (cada variable tiene un peso que se puede explicar) y por ser la más rápida. **Su ventaja es de empate estadístico: se elige por simplicidad, no porque sea claramente mejor.**
+- **Mejor precisión de `Fail`** (de los estudiantes a quienes se avisa, cuántos de verdad pierden el curso): la **regresión logística**, 0,760, frente a 0,759 de LightGBM y XGBoost y 0,712 de random forest y KNN. Entre los tres primeros la diferencia es de 0,001: es un empate.
+- **Mejor ordenamiento** (ROC-AUC 0,894, PR-AUC 0,950, *log loss* 0,370): LightGBM y XGBoost, por 0,002 sobre la logística.
+- **Descartados:** KNN (peor modelo real), random forest (pierde en los 5 pliegues, 7,4 a 8,5 veces el ruido; ahorra la mitad), LightGBM y XGBoost (empate con la logística y más complejos), `DummyRegressor` (igual a la línea base).
+- **Precisión si solo se avisa al 30 % más riesgoso:** 98,3 % la regresión logística, 98,2 % LightGBM y XGBoost, 97,5 % random forest y 91,8 % KNN (el azar, 68,9 %). Los modelos **ordenan casi perfecto a los más riesgosos**.
+
+> Que la regresión logística iguale a los modelos de boosting sugiere que las relaciones con `Fail` son casi lineales (hipótesis; el dataset parece sintético). **El torneo elige al ganador para seguir adelante, no lo corona:** la optimización (etapa 6) y la prueba final (etapa 7) pueden cambiar el panorama.
 
 ## 5. Datos relevantes de los notebooks
 
 - **El modelo supera a «avisar a todos»:** costo 0,258 frente a 0,308 (**ahorro de ≈ 16 %**) con NPV de 91,7 % (mínimo exigido: 83,3 %).
 - **Ahorro ilustrativo** por 100.000 estudiantes (el tamaño del dataset; no es un dato de la institución): ≈ 5.000 unidades de costo frente a avisar a todos.
 - **Con la regla de la «clase más probable»** (umbral 0,5), la regresión logística cuesta **0,437, peor que no hacer nada** (0,308): la regla de decisión de negocio es indispensable.
-- **Peor caso, sin `exam_difficulty`, `time_management_score` y `exam_anxiety_level`:** todos empeoran (logística 0,2576 → 0,2816; LightGBM 0,2584 → 0,2815) y la ventaja sobre la línea base **se reduce a la mitad** (≈ 0,050 → ≈ 0,026). Los tres primeros siguen empatados, por lo que **la elección de finalistas no depende de ese supuesto; el valor del modelo sí.**
+- **Peor caso, sin `exam_difficulty`, `time_management_score` y `exam_anxiety_level`:** todos empeoran (logística 0,2576 → 0,2816; LightGBM 0,2584 → 0,2815) y la ventaja sobre la línea base **se reduce a la mitad** (≈ 0,050 → ≈ 0,026). Los tres primeros siguen empatados, por lo que **la elección del ganador no depende de ese supuesto; el valor del modelo sí.**
 
 ## 6. Alertas importantes
 
@@ -140,7 +145,7 @@ Estrategias **sin modelo** con costos 5 : 1 (costo por estudiante, menor es mejo
 ## 8. Qué sigue
 
 1. Confirmar los supuestos de la sección 7.
-2. **Etapa 6 · Optimización** de los 2 finalistas (con seguimiento en MLflow) y ajuste del umbral con validación.
+2. **Etapa 6 · Optimización** del modelo ganador (regresión logística, con seguimiento en MLflow) y ajuste del umbral con validación.
 3. **Etapa 7 · Validación**: abrir la prueba **una sola vez**, evaluar calibración, equidad por grupo e interpretación.
 4. Etapas 8 y 9: registro del modelo y app en Streamlit (la app no consulta Databricks).
 
