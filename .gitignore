@@ -138,7 +138,7 @@ __azurite_db*__.json
 kaggle.json
 data/raw/*
 !data/raw/.gitkeep
-mlflow_local.db
+# mlflow_local.db
 mlruns/
 .verify-*
 models/final_pipeline.joblib
