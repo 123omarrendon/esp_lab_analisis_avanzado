@@ -27,6 +27,6 @@
     ]
   },
   "ensayos": 25,
-  "mlflow_parent_run_id": "1970b3395c3c446b8ca7051eb1786c0f",
+  "mlflow_parent_run_id": "03b36226e14b40688485354167bcf63a",
   "tracking": "local"
 }

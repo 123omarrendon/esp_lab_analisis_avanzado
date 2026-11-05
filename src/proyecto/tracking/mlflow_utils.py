@@ -12,6 +12,7 @@ Dos formas de conectar a Databricks, ambas leídas de `.env`:
   - DATABRICKS_HOST + DATABRICKS_TOKEN          -> databricks
 """
 import os
+import sqlite3
 import tempfile
 import warnings
 from pathlib import Path
@@ -25,9 +26,40 @@ LOCAL_DB = ROOT / "mlflow_local.db"  # se genera sola; no se versiona
 PLACEHOLDER_PROFILE = "nombre-de-tu-perfil"  # valor de .env.example sin completar
 
 
+def _databricks_filesystem() -> bool:
+    """True si existe la carpeta `/databricks` (solo está en las máquinas de Databricks)."""
+    return Path("/databricks").is_dir()
+
+
 def is_databricks() -> bool:
-    """True si el código corre dentro de un workspace de Databricks."""
-    return "DATABRICKS_RUNTIME_VERSION" in os.environ
+    """True si el código corre dentro de un workspace de Databricks.
+
+    Mira la variable `DATABRICKS_RUNTIME_VERSION` y, por si algún tipo de cómputo no la define, la carpeta `/databricks`.
+    """
+    return "DATABRICKS_RUNTIME_VERSION" in os.environ or _databricks_filesystem()
+
+
+def _sqlite_writable(db_path: Path) -> bool:
+    """True si SQLite puede ESCRIBIR en `db_path`, exista ya el archivo o no. Se prueba de verdad, con un archivo de prueba.
+
+    Mirar permisos no basta: en `/Workspace/...` de Databricks se pueden crear archivos, pero SQLite falla con
+    «attempt to write a readonly database».
+    """
+    if Path(db_path).exists() and not os.access(db_path, os.W_OK):
+        return False                                    # el archivo existe (p. ej. viene en el repo) pero es de solo lectura
+    probe = Path(db_path).parent / ".mlflow_probe.db"
+    try:
+        with sqlite3.connect(probe) as conn:
+            conn.execute("CREATE TABLE IF NOT EXISTS probe (x INTEGER)")
+            conn.execute("INSERT INTO probe VALUES (1)")
+        return True
+    except (sqlite3.Error, OSError):
+        return False
+    finally:
+        try:
+            probe.unlink()
+        except OSError:
+            pass
 
 
 def _reachable() -> bool:
@@ -61,9 +93,10 @@ def configure_mlflow(force_local: bool = False, local_db: Path = LOCAL_DB, env_f
             mlflow.set_registry_uri("databricks-uc")
             if _reachable():
                 return "databricks (token)"
-    if is_databricks() and Path(local_db) == LOCAL_DB:
-        # La carpeta del repo en el workspace (/Workspace/...) es de solo lectura para SQLite
+    if Path(local_db) == LOCAL_DB and (is_databricks() or not _sqlite_writable(LOCAL_DB)):
+        # La carpeta del repo en el workspace (/Workspace/...) no sirve para SQLite
         # («attempt to write a readonly database»): el respaldo local va a una carpeta temporal escribible.
+        # Un archivo elegido a propósito (`local_db` distinto del valor por defecto) se respeta siempre.
         local_db = Path(tempfile.gettempdir()) / LOCAL_DB.name
     local_uri = f"sqlite:///{Path(local_db).as_posix()}"
     mlflow.set_tracking_uri(local_uri)
