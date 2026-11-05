@@ -12,6 +12,7 @@ Dos formas de conectar a Databricks, ambas leídas de `.env`:
   - DATABRICKS_HOST + DATABRICKS_TOKEN          -> databricks
 """
 import os
+import tempfile
 import warnings
 from pathlib import Path
 
@@ -42,6 +43,10 @@ def _reachable() -> bool:
 def configure_mlflow(force_local: bool = False, local_db: Path = LOCAL_DB, env_file: Path = ROOT / ".env") -> str:
     """Configura MLflow y devuelve una descripción de dónde quedó: 'databricks (...)' o 'local'."""
     if is_databricks() and not force_local:
+        # Dentro del workspace se apunta explícitamente a Databricks: así, si en la misma sesión se había configurado
+        # un archivo local antes, se corrige al volver a ejecutar la celda.
+        mlflow.set_tracking_uri("databricks")
+        mlflow.set_registry_uri("databricks-uc")
         return "databricks (dentro del workspace)"
     load_dotenv(env_file)
     if not force_local and os.environ.get("MLFLOW_FORCE_LOCAL") != "1":
@@ -56,6 +61,10 @@ def configure_mlflow(force_local: bool = False, local_db: Path = LOCAL_DB, env_f
             mlflow.set_registry_uri("databricks-uc")
             if _reachable():
                 return "databricks (token)"
+    if is_databricks() and Path(local_db) == LOCAL_DB:
+        # La carpeta del repo en el workspace (/Workspace/...) es de solo lectura para SQLite
+        # («attempt to write a readonly database»): el respaldo local va a una carpeta temporal escribible.
+        local_db = Path(tempfile.gettempdir()) / LOCAL_DB.name
     local_uri = f"sqlite:///{Path(local_db).as_posix()}"
     mlflow.set_tracking_uri(local_uri)
     mlflow.set_registry_uri(local_uri)

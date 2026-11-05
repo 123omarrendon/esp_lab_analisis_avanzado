@@ -109,7 +109,7 @@ Estrategias **sin modelo** con costos 5 : 1 (costo por estudiante, menor es mejo
 
 ### Etapa 6 · Optimización (`06b`) — regresión logística, 25 ensayos
 
-- **Qué se buscó:** `C` (0,001 a 100, escala logarítmica) y el **umbral de decisión** (0,05 a 0,40). La regresión logística casi no tiene hiperparámetros, por eso el espacio es corto. Cada ensayo quedó registrado en **MLflow local** (25 de 25).
+- **Qué se buscó:** `C` (0,001 a 100, escala logarítmica) y el **umbral de decisión** (0,05 a 0,40). La regresión logística casi no tiene hiperparámetros, por eso el espacio es corto. Cada ensayo quedó registrado en **MLflow** (25 de 25; esta ejecución fue local y en Databricks va al workspace de forma automática).
 - **Cómo se comprobó:** se reservó el 25 % de los estudiantes (20.000) que la búsqueda no vio y se comparó ahí el modelo de partida (`C = 1`, umbral 0,167) con el optimizado (`C = 0,0376`, umbral 0,1666), con un intervalo del 95 %. La regla de decisión se escribió antes de mirar.
 - **Resultado: optimizar no mejora.** Costo en los reservados: 0,2547 (partida) frente a 0,2548 (optimizado); diferencia +0,0001, intervalo [−0,00135; +0,00135], **cruza el cero**. Se **mantienen los parámetros de partida**. La mejor puntuación de la búsqueda (0,2582) era optimista y, además, no comparable con la de los reservados (estudiantes distintos).
 - **El umbral hallado coincide con el teórico:** 0,1666 frente a 1 / (1 + 5) = 0,1667. Sugiere que las probabilidades de la regresión logística están razonablemente calibradas para los costos 5 : 1 (se confirma en la etapa 7).
