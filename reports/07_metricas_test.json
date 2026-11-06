@@ -1,0 +1,120 @@
+{
+  "decisiones": {
+    "fecha_y_hora": "2026-11-05T20:12:56",
+    "modelo_final": "regresión logística",
+    "variables": "28 de la etapa 4 (feature_columns(drop=STAGE4_DROP), sin indicador de vacío)",
+    "parametros": {
+      "C": 1.0
+    },
+    "umbral": 0.16666666666666666,
+    "calibrar": false,
+    "metrica_principal": "costo esperado por estudiante (falso negativo : falso positivo = 5 : 1, supuesto); menor es mejor",
+    "metricas_de_control": [
+      "recall de Fail",
+      "NPV (mínimo 83,3 %)",
+      "alertas por 100"
+    ],
+    "regla_de_decision": "avisar si P(Fail) >= umbral (1/6 = 1 / (1 + 5))",
+    "comparacion": "contra «avisar a todos» (el DummyRegressor es idéntico)",
+    "como_se_decidio": "etapas 4 a 6 con validación cruzada; calibración con los 20.000 estudiantes reservados de la etapa 6; la prueba no se miró",
+    "calibracion": {
+      "log_loss_sin": 0.3736937619640898,
+      "log_loss_con": 0.3737010012821321,
+      "costo_sin": 0.25475,
+      "costo_con": 0.25475,
+      "diferencia_costo": 0.0,
+      "intervalo_95": [
+        -0.00085,
+        0.0006
+      ]
+    }
+  },
+  "prueba": {
+    "cost": 0.255,
+    "recall_fail": 0.9878630255743389,
+    "precision_fail": 0.7624623619939779,
+    "npv": 0.9186834462729913,
+    "specificity": 0.3082169535563495,
+    "f1_fail": 0.8606495468277946,
+    "f2_fail": 0.9327167062290251,
+    "balanced_accuracy": 0.6480399895653441,
+    "accuracy": 0.7786,
+    "alerts_per_100": 89.67,
+    "tp": 13674.0,
+    "fn": 168.0,
+    "fp": 4260.0,
+    "tn": 1898.0,
+    "cost_argmax": 0.42155,
+    "precision_top30": 0.9825,
+    "recall_top30": 0.4258777633289987,
+    "cost_top30": 1.992,
+    "precision_top50": 0.9421,
+    "recall_top50": 0.6806097384770987,
+    "cost_top50": 1.1342,
+    "pr_auc_fail": 0.9496393132135716,
+    "roc_auc": 0.895554027617112,
+    "log_loss": 0.3679067408597127,
+    "estudiantes": 20000,
+    "fail_real": 0.6921
+  },
+  "baseline_avisar_a_todos": {
+    "cost": 0.3079,
+    "recall_fail": 1.0,
+    "precision_fail": 0.6921,
+    "npv": NaN,
+    "specificity": 0.0,
+    "f1_fail": 0.8180367590567933,
+    "f2_fail": 0.9182942362806497,
+    "balanced_accuracy": 0.5,
+    "accuracy": 0.6921,
+    "alerts_per_100": 100.0,
+    "tp": 13842.0,
+    "fn": 0.0,
+    "fp": 6158.0,
+    "tn": 0.0
+  },
+  "intervalos_95": [
+    {
+      "medida": "costo por estudiante (menor es mejor)",
+      "valor": 0.255,
+      "IC 95 % inferior": 0.24669875,
+      "IC 95 % superior": 0.26340250000000004
+    },
+    {
+      "medida": "recall de Fail",
+      "valor": 0.9878630255743389,
+      "IC 95 % inferior": 0.9860655498607648,
+      "IC 95 % superior": 0.9896013549975726
+    },
+    {
+      "medida": "NPV (mínimo exigido: 0,833)",
+      "valor": 0.9186834462729913,
+      "IC 95 % inferior": 0.9071557383701896,
+      "IC 95 % superior": 0.9302098701320515
+    },
+    {
+      "medida": "alertas por 100",
+      "valor": 89.67,
+      "IC 95 % inferior": 89.279875,
+      "IC 95 % superior": 90.065
+    },
+    {
+      "medida": "costo de «avisar a todos»",
+      "valor": 0.3079,
+      "IC 95 % inferior": 0.30155,
+      "IC 95 % superior": 0.31415125
+    },
+    {
+      "medida": "costo: modelo − «avisar a todos»",
+      "valor": -0.0529,
+      "IC 95 % inferior": -0.06045,
+      "IC 95 % superior": -0.04554875
+    }
+  ],
+  "supera_al_baseline_con_confianza": {
+    "costo": true,
+    "npv": true,
+    "ambas": true
+  },
+  "prueba_abierta": "Prueba abierta el 2026-11-05T20:12:58. Modelo regresión logística, calibrar=False, umbral 0.1667. Una sola vez."
+}

@@ -1,0 +1,30 @@
+{
+  "fecha_y_hora": "2026-11-05T20:12:56",
+  "modelo_final": "regresión logística",
+  "variables": "28 de la etapa 4 (feature_columns(drop=STAGE4_DROP), sin indicador de vacío)",
+  "parametros": {
+    "C": 1.0
+  },
+  "umbral": 0.16666666666666666,
+  "calibrar": false,
+  "metrica_principal": "costo esperado por estudiante (falso negativo : falso positivo = 5 : 1, supuesto); menor es mejor",
+  "metricas_de_control": [
+    "recall de Fail",
+    "NPV (mínimo 83,3 %)",
+    "alertas por 100"
+  ],
+  "regla_de_decision": "avisar si P(Fail) >= umbral (1/6 = 1 / (1 + 5))",
+  "comparacion": "contra «avisar a todos» (el DummyRegressor es idéntico)",
+  "como_se_decidio": "etapas 4 a 6 con validación cruzada; calibración con los 20.000 estudiantes reservados de la etapa 6; la prueba no se miró",
+  "calibracion": {
+    "log_loss_sin": 0.3736937619640898,
+    "log_loss_con": 0.3737010012821321,
+    "costo_sin": 0.25475,
+    "costo_con": 0.25475,
+    "diferencia_costo": 0.0,
+    "intervalo_95": [
+      -0.00085,
+      0.0006
+    ]
+  }
+}

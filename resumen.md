@@ -1,7 +1,7 @@
 # Resumen del trabajo: ¿aprueba o pierde el curso el estudiante?
 
-> Resumen de lo construido sobre `data/student_exam_performance.csv` (100.000 estudiantes × 44 columnas) en las etapas 1 a 6.
-> Todas las cifras salen de los notebooks `01b` a `05b` ejecutados con los datos reales, usando **solo el conjunto de entrenamiento** (la prueba sigue cerrada hasta la etapa 7).
+> Resumen de lo construido sobre `data/student_exam_performance.csv` (100.000 estudiantes × 44 columnas) en las etapas 1 a 8.
+> Las cifras de las etapas 1 a 6 salen de los notebooks `01b` a `06b` ejecutados con los datos reales, usando **solo el conjunto de entrenamiento**. La **etapa 7 (`07b`) abrió la prueba una sola vez** (2026-11-05 20:12:58); desde entonces la prueba no se usa para decidir nada.
 > **Estado:** los resultados y las decisiones son **propuestas**; el grupo debe aprobarlas y la institución debe confirmar los supuestos marcados en la sección 7.
 
 ## 1. El problema en una frase
@@ -25,6 +25,8 @@ Predecir, **antes del examen**, qué estudiantes van a **perder el curso** para 
 | `04b_features_aprueba_o_no.ipynb` | 4 · Variables | `04_features.ipynb` y CreditSight | Mide 8 ideas de variables con los mismos pliegues |
 | `05b_torneo_aprueba_o_no.ipynb` | 5 · Torneo | `05_torneo.ipynb` y CreditSight | Compara 5 modelos (incluido **KNN de 5 vecinos**) y 2 referencias sin modelo (incluido `DummyRegressor`); elige **un solo ganador** |
 | `06b_optimizacion_aprueba_o_no.ipynb` | 6 · Optimización | `06_optimizacion.ipynb` y CreditSight | Optimiza el modelo ganador (regresión logística) con Optuna y MLflow, y comprueba con estudiantes reservados si la mejora es real |
+| `07b_validacion_aprueba_o_no.ipynb` | 7 · Validación | `07_validacion_interpretacion.ipynb` y CreditSight | Congela las decisiones (¿calibrar?), abre la prueba **una sola vez**, mide con intervalos frente a «avisar a todos», audita la equidad por grupo e interpreta el modelo (coeficientes y SHAP) |
+| `08b_registro_modelo_aprueba_o_no.ipynb` | 8 · Registro | `08_registro_modelo.ipynb` (esqueleto) y CreditSight | Registra el modelo final en MLflow (versión 1, alias `champion`) con firma, métricas de la prueba y etiquetas; comprueba la ida y vuelta y responde si el modelo mejoró con las iteraciones |
 
 Cada uno continúa al anterior y solo **orquesta**: la lógica vive en `src/`.
 
@@ -36,8 +38,9 @@ Cada uno continúa al anterior y solo **orquesta**: la lógica vive en `src/`.
 | `data/split.py` | `split_train_test` (80/20 estratificado, semilla 42) y `make_folds` (5 pliegues por fila, estratificados) |
 | `features/engineering.py` | Lista de variables, variables nuevas (`add_features`), imputación dentro del `Pipeline` (`build_preprocessor`) |
 | `models/tuning.py` | Optimización con Optuna (`tune`): espacio de `C` y umbral de decisión, cada ensayo registrado en MLflow; intervalos del 95 % por remuestreo de estudiantes (`bootstrap_cost_difference`) |
+| `models/validation.py` | Etapa 7: regla de calibración (`decide_calibration`), decisiones congeladas con fecha y hora (`freeze_decisions`), prueba que se abre una sola vez (`open_test_once`), intervalos de una métrica (`metric_with_ci`), desempeño por grupo (`segment_table`, `age_band`) e interpretación (`coefficient_table`, `shap_importance`, `student_contributions`) |
 | `models/train.py` | Candidatos del torneo (`candidates`: 5 modelos + 2 referencias, `MeanProbabilityRegressor` para usar un `DummyRegressor` como clasificador), `build_pipeline`, métricas de negocio (`business_metrics`), `evaluate_folds`, avisar solo al k % más riesgoso (`top_k_alert`) |
-| `tests/test_cleaning.py`, `test_split.py`, `test_features.py`, `test_train.py`, `test_tuning.py` (+ `toy.py`) | **89 pruebas** (con las de seguimiento) armadas a mano; todas pasan |
+| `tests/test_cleaning.py`, `test_split.py`, `test_features.py`, `test_train.py`, `test_tuning.py`, `test_validation.py` (+ `toy.py`) | Pruebas armadas a mano; todas pasan (124 en `tests/`, con las de seguimiento e inferencia) |
 
 **Pruebas que pueden fallar:** se introdujeron errores a propósito (por ejemplo `>` en vez de `>=` en el corte de 70, umbral invertido, una columna de fuga entre las variables, partir sin estratificar) y las pruebas los detectaron todos. Dos mutaciones sobrevivieron al principio y se corrigieron las pruebas.
 
@@ -109,12 +112,48 @@ Estrategias **sin modelo** con costos 5 : 1 (costo por estudiante, menor es mejo
 
 ### Etapa 6 · Optimización (`06b`) — regresión logística, 25 ensayos
 
-- **Qué se buscó:** `C` (0,001 a 100, escala logarítmica) y el **umbral de decisión** (0,05 a 0,40). La regresión logística casi no tiene hiperparámetros, por eso el espacio es corto. Cada ensayo quedó registrado en **MLflow** (25 de 25; esta ejecución fue local y en Databricks va al workspace de forma automática).
+- **Qué se buscó:** `C` (0,001 a 100, escala logarítmica) y el **umbral de decisión** (0,05 a 0,40). La regresión logística casi no tiene hiperparámetros, por eso el espacio es corto. Cada ensayo quedó registrado en **MLflow** (25 de 25). La corrida que fijó los parámetros (`reports/06_best_params.json`) se ejecutó **dentro de Databricks**, en el experimento `proyecto-optimizacion-aprueba-o-no`, ejecución madre `5106d436c4fe4612bdaea74bf6b9ef36`; las salidas guardadas en el notebook vienen de una corrida local previa.
 - **Cómo se comprobó:** se reservó el 25 % de los estudiantes (20.000) que la búsqueda no vio y se comparó ahí el modelo de partida (`C = 1`, umbral 0,167) con el optimizado (`C = 0,0376`, umbral 0,1666), con un intervalo del 95 %. La regla de decisión se escribió antes de mirar.
 - **Resultado: optimizar no mejora.** Costo en los reservados: 0,2547 (partida) frente a 0,2548 (optimizado); diferencia +0,0001, intervalo [−0,00135; +0,00135], **cruza el cero**. Se **mantienen los parámetros de partida**. La mejor puntuación de la búsqueda (0,2582) era optimista y, además, no comparable con la de los reservados (estudiantes distintos).
 - **El umbral hallado coincide con el teórico:** 0,1666 frente a 1 / (1 + 5) = 0,1667. Sugiere que las probabilidades de la regresión logística están razonablemente calibradas para los costos 5 : 1 (se confirma en la etapa 7).
 - **Ahorro sin sesgo de optimización:** en los reservados, «avisar a todos» cuesta 0,3079 y el modelo 0,2547 (≈ 17 % menos).
 - **Una optimización sin mejora no es un fracaso:** documenta que se buscó con un presupuesto y un espacio justificados.
+
+### Etapa 7 · Validación (`07b`) — la prueba (20.000 estudiantes), abierta una sola vez
+
+- **Decisiones congeladas antes** (`reports/07_decisiones_congeladas.json`, 20:12:56; la prueba se abrió a las 20:12:58): regresión logística, `C = 1`, umbral 1/6 y **sin calibrar**. La calibración se decidió con los 20.000 reservados de la etapa 6: *log loss* 0,3737 con y sin calibrar, costo igual (diferencia 0,0000, IC [−0,00085; +0,00060]); la curva de calibración sigue la diagonal.
+- **Resultado en la prueba** (intervalo del 95 % remuestreando estudiantes):
+
+| Medida | Modelo | «Avisar a todos» | IC 95 % del modelo |
+|---|---|---|---|
+| Costo por estudiante | **0,2550** | 0,3079 | [0,2467; 0,2634] |
+| *Recall* de `Fail` | 0,988 | 1,000 | [0,986; 0,990] |
+| NPV (mínimo 0,833) | 0,919 | no existe | [0,907; 0,930] |
+| Alertas por 100 | 89,7 | 100 | [89,3; 90,1] |
+
+- **¿Supera al punto de partida con confianza? Sí:** diferencia de costo −0,0529, IC [−0,0604; −0,0455] (todo por debajo de cero) y límite inferior del NPV (0,907) sobre 0,833. Ahorro ≈ 17 %, igual al visto en los reservados (0,2547): no se perdió generalización.
+- **Equidad** (`gender`, `family_income`, `urban_rural`, `school_type`, `education_level`, edad por tramos): el *recall* es casi igual (brecha máxima 0,013). Lo que sí se ve es por ingreso: se avisa al 93,2 % de `Low` y al 84,0 % de `High`, y el NPV baja a 0,888 en `Low` (frente a 0,942 en `High`). Las alertas siguen la brecha real de `Fail` (76,4 % frente a 59,7 %) aunque `family_income` no entra al modelo (por qué, es una hipótesis sin probar). `gender` = `Other` tiene solo 384 casos: sus cifras son inestables.
+- **Por qué decide así** (coeficientes y SHAP): pesan `exam_difficulty` (Difícil: *odds ratio* 4,5), la nota previa (0,23 por desviación estándar), las horas de estudio por día y las pruebas de práctica. Las variables sensibles que el modelo sí usa (`parent_education`, `urban_rural`, `school_type`) reparten solo el 4,2 % de la influencia. **Límite:** explica al modelo, no al mundo.
+- Archivos: `reports/07_validacion.md`, `07_metricas_test.json`, `07_errores_por_segmento.csv`, `07_coeficientes.csv`, `07_importancia_shap.csv`, `prueba_abierta.txt`; modelo en `models/final_pipeline.joblib`.
+
+### Etapa 8 · Registro (`08b`) y ¿mejoró el modelo con las iteraciones?
+
+- **Qué se registró:** `estudiantes_aprueba_o_no`, **versión 1, alias `champion`**, con parámetros (`C = 1`, umbral 1/6), 32 métricas de la prueba, firma de 28 columnas de entrada, ejemplo de entrada y etiquetas. Ejecución `29f92c84…`. **Ida y vuelta:** el modelo recuperado del registro predice igual (diferencia máxima 0,0 en 500 estudiantes).
+- **Dónde:** MLflow **local**. No hay `.env` en este equipo, así que no quedó en Databricks (pendiente: completar `.env` y volver a ejecutar).
+- **¿Mejoró con las iteraciones?** La tabla completa está en `reports/08_evolucion_modelo.csv`:
+
+| Cambio | Costo | ¿Mejora distinguible? |
+|---|---|---|
+| «Avisar a todos» → primer modelo (35 variables) | 0,3079 → 0,2579 | **Sí** (≈ 10 veces el ruido) |
+| 35 → 28 variables | 0,2579 → 0,2584 | No |
+| LightGBM → regresión logística | 0,2584 → 0,2576 | No (empate; gana por simplicidad) |
+| Optimizar `C` y umbral (reservados) | 0,2547 → 0,2548 | No (IC cruza el cero) |
+| Calibrar (reservados) | 0,2547 → 0,2547 | No |
+| **Prueba final** | **0,2550** [0,2467; 0,2634] | **Sí** frente a «avisar a todos» (−0,0529) |
+
+- **Lectura honesta:** la **única mejora real** es tener un modelo frente a no tenerlo (≈ 17 % menos de costo), y ya estaba en el primer modelo. Las iteraciones siguientes dejaron un modelo más simple, calibrado y explicable, pero **no bajaron el costo de forma medible**. La prueba coincide con los reservados (0,2550 frente a 0,2547): no hubo sobreajuste de selección. Registrar el modelo no lo cambió.
+- **Aviso de reproducibilidad:** `mlflow_local.db` es de MLflow **3.18.0** y `requirements.txt` fija 3.17.1, que no la abre; hay que alinear una de las dos.
+- Archivos: `reports/08_registro.md`, `08_registro.json`, `08_evolucion_modelo.csv`; ficha en `models/ficha_modelo.md`.
 
 ## 4. ¿Qué modelo gana y cuál tiene mejor precisión?
 
@@ -126,7 +165,7 @@ Estrategias **sin modelo** con costos 5 : 1 (costo por estudiante, menor es mejo
 - **Descartados:** KNN (peor modelo real), random forest (pierde en los 5 pliegues, 7,4 a 8,5 veces el ruido; ahorra la mitad), LightGBM y XGBoost (empate con la logística y más complejos), `DummyRegressor` (igual a la línea base).
 - **Precisión si solo se avisa al 30 % más riesgoso:** 98,3 % la regresión logística, 98,2 % LightGBM y XGBoost, 97,5 % random forest y 91,8 % KNN (el azar, 68,9 %). Los modelos **ordenan casi perfecto a los más riesgosos**.
 
-> Que la regresión logística iguale a los modelos de boosting sugiere que las relaciones con `Fail` son casi lineales (hipótesis; el dataset parece sintético). **El torneo elige al ganador para seguir adelante, no lo corona:** la optimización (etapa 6) y la prueba final (etapa 7) pueden cambiar el panorama.
+> Que la regresión logística iguale a los modelos de boosting sugiere que las relaciones con `Fail` son casi lineales (hipótesis; el dataset parece sintético). **El torneo elige al ganador para seguir adelante, no lo corona:** la optimización (etapa 6) no lo cambió y la prueba final (etapa 7) lo confirmó: supera a «avisar a todos» con confianza.
 
 ## 5. Datos relevantes de los notebooks
 
@@ -139,8 +178,9 @@ Estrategias **sin modelo** con costos 5 : 1 (costo por estudiante, menor es mejo
 
 1. **El aviso casi no discrimina con el costo 5 : 1:** el modelo avisa a **≈ 90 de cada 100 estudiantes** y deja tranquilo solo al **30 %** de quienes aprobarían (especificidad 0,30). La exactitud (0,78) lo esconde; la exactitud balanceada (0,64) dice la verdad.
 2. **Con capacidad limitada, el costo 5 : 1 deja de ser la métrica adecuada.** Si solo se puede avisar al 30 % más riesgoso, el modelo acierta el 98 % de sus alertas, pero el costo sube a 1,99 (frente a 0,308), porque cada estudiante en riesgo sin aviso cuesta 5. La institución debe definir su capacidad real de tutoría.
-3. **El umbral de 0,167** supone probabilidades bien calibradas. La etapa 6 lo ajustó con validación y encontró el mismo valor (0,1666): buena señal. La calibración formal se evalúa en la etapa 7, **sin usar la prueba hasta entonces**.
-4. **Atributos sensibles:** `gender` y `family_income` quedan fuera del modelo; `age` sale por no aportar. La auditoría por grupo (equidad) es de la etapa 7.
+3. **El umbral de 0,167** supone probabilidades bien calibradas. La etapa 6 lo ajustó con validación y encontró el mismo valor (0,1666): buena señal. La etapa 7 lo confirmó: la calibración no mejoró nada (el modelo ya estaba calibrado).
+4. **Atributos sensibles:** `gender` y `family_income` quedan fuera del modelo; `age` sale por no aportar. La auditoría de la etapa 7 muestra *recall* parejo entre grupos, pero **más alertas y peor NPV para ingreso `Low`** (93,2 % y 0,888, frente a 84,0 % y 0,942 en `High`): la institución debe decidir si es aceptable.
+5. **La prueba ya se abrió.** No se vuelve a usar para elegir nada; cualquier cambio posterior de modelo, umbral o variables debe declararse y validarse con datos nuevos.
 
 ## 7. Supuestos pendientes (a confirmar)
 
@@ -156,18 +196,19 @@ Estrategias **sin modelo** con costos 5 : 1 (costo por estudiante, menor es mejo
 ## 8. Qué sigue
 
 1. Confirmar los supuestos de la sección 7.
-2. **Etapa 7 · Validación** del modelo final (regresión logística, `C = 1`, umbral 0,167): abrir la prueba **una sola vez**, evaluar calibración, equidad por grupo e interpretación.
-3. Aprobación del grupo de las decisiones de las etapas 4 a 6.
-4. Etapas 8 y 9: registro del modelo y app en Streamlit (la app no consulta Databricks).
+2. Aprobación del grupo de las decisiones de las etapas 4 a 7 (y decidir con la institución qué hacer con la brecha de alertas por ingreso).
+3. Registrar el modelo en Databricks (completar `.env`) y alinear la versión de MLflow (`requirements.txt` frente a `mlflow_local.db`).
+4. Etapa 9: exportar `models/model.joblib` desde `champion` y la app en Streamlit (la app no consulta Databricks).
 
 ## 9. Cómo reproducirlo
 
 ```bash
 uv pip install -r requirements.txt     # Python 3.12
 pytest -q                              # pruebas de data, features y models
-# Ejecutar los notebooks en orden: 01b, 02b, 03b, 04b, 05b, 06b
-# (04b, 05b y 06b leen data/processed/train.joblib, que genera 03b)
-# 06b guarda el seguimiento en mlflow_local.db (ignorado por Git): mlflow ui --backend-store-uri sqlite:///mlflow_local.db
+# Ejecutar los notebooks en orden: 01b, 02b, 03b, 04b, 05b, 06b, 07b
+# (04b, 05b y 06b leen data/processed/train.joblib, que genera 03b; 07b abre test.joblib UNA vez y deja reports/prueba_abierta.txt)
+# 06b registra en Databricks si corre en el workspace o hay .env con la conexión; si no, cae a mlflow_local.db
+# (ignorado por Git): mlflow ui --backend-store-uri sqlite:///mlflow_local.db
 ```
 
 Tablas de resultados: `reports/04_features_tabla.csv` y `reports/05_torneo_tabla.csv`, `05_torneo_tecnicas.csv`, `05_torneo_capacidad.csv`, `05_torneo_peor_caso.csv`, `06_comprobacion.csv` y `06_best_params.json`. Informes: `reports/01_eda.md`, `reports/04_features.md`, `reports/05_torneo.md`, `reports/06_optimizacion.md`.

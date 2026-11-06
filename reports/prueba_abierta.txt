@@ -1,0 +1,1 @@
+Prueba abierta el 2026-11-05T20:12:58. Modelo regresión logística, calibrar=False, umbral 0.1667. Una sola vez.

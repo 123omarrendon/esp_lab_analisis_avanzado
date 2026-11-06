@@ -22,9 +22,9 @@
 
 ## Seguimiento (tracking)
 
-- **Dónde quedó registrado** y **nombre del experimento:** configuración automática (`configure_mlflow()`): dentro de Databricks, en el propio workspace; en un computador sin `.env`, MLflow local (`mlflow_local.db` en la raíz, ignorado por Git). Esta ejecución fue **local**; experimento `proyecto-optimizacion-aprueba-o-no`. Para verlo en local: `mlflow ui --backend-store-uri sqlite:///mlflow_local.db`. **No usar `force_local=True` dentro de Databricks:** la carpeta del repo en el workspace es de solo lectura para SQLite (`attempt to write a readonly database`).
+- **Dónde quedó registrado** y **nombre del experimento:** la corrida que fija los parámetros (`reports/06_best_params.json`) se ejecutó **dentro de Databricks** (MLflow del propio workspace, `tracking: databricks`), experimento `proyecto-optimizacion-aprueba-o-no`, ejecución madre `5106d436c4fe4612bdaea74bf6b9ef36` con 25 ejecuciones anidadas. La configuración es automática (`configure_mlflow()`): en un computador sin `.env` cae a MLflow local (`mlflow_local.db`, ignorado por Git; las salidas guardadas en el notebook vienen de una corrida local previa, ejecución madre `1970b3395c3c446b8ca7051eb1786c0f`). Para ver la local: `mlflow ui --backend-store-uri sqlite:///mlflow_local.db`. **No usar `force_local=True` dentro de Databricks:** la carpeta del repo en el workspace es de solo lectura para SQLite (`attempt to write a readonly database`).
 - **¿Está cada ensayo como una ejecución con parámetros, métrica y etiquetas?** ☑ sí: el notebook comprueba que hay 25 ejecuciones registradas de 25 ensayos, anidadas en una ejecución madre, con todas las métricas (negocio y técnicas) y etiquetas (`etapa`, `modelo`, `metrica_optimizada`).
-- **Mejor ejecución** (identificador y métrica): la del ensayo 19, costo 0,2582 en la búsqueda (el identificador cambia en cada ejecución del notebook; queda en `reports/06_best_params.json`).
+- **Mejor ejecución** (identificador y métrica): el ensayo 19, costo 0,2582 en la búsqueda. El identificador de la ejecución madre en Databricks queda en `reports/06_best_params.json`; el de cada ensayo cambia en cada ejecución del notebook y se consulta en la pestaña *Experiments* o con `mlflow.search_runs`.
 
 ## Resultados de la búsqueda
 

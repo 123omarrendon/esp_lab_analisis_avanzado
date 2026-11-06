@@ -1,0 +1,9 @@
+etapa,qué se cambió,con qué estudiantes,costo,incertidumbre,¿mejoró? (frente a lo anterior)
+0 · Sin modelo: «avisar a todos»,—,"validación cruzada, 80.000",0.3079,± 0.0000,punto de partida
+4 · Modelo con las 35 variables (LightGBM),primer modelo real,"validación cruzada, 80.000",0.25786,± 0.0048,mejora frente a «avisar a todos» (−0.050)
+4 · Propuesta final: 28 variables (LightGBM),"−7 variables sin señal, sin indicador de vacío","validación cruzada, 80.000",0.2584,± 0.0030,no se distingue del ruido (pero el modelo es más simple)
+5 · Torneo: regresión logística (28 variables),cambio de modelo,"validación cruzada, 80.000",0.25764,± 0.0032,no se distingue del ruido (empate con LightGBM; gana por simplicidad)
+"6 · Optimización: partida (C = 1, umbral 1/6)",—,20.000 reservados,0.25475,—,punto de partida de la comparación
+6 · Optimización: C y umbral optimizados,25 ensayos de Optuna,20.000 reservados,0.25485,IC dif. [-0.0014; +0.0014],no se distingue del ruido
+7 · Calibración (sigmoide),probabilidades recalibradas,20.000 reservados,0.25475,IC dif. [-0.0008; +0.0006],no se distingue del ruido (no se calibró)
+"7 · PRUEBA, abierta una sola vez","modelo final, sin cambios",20.000 de la prueba,0.255,IC [0.2467; 0.2634],mejora frente a «avisar a todos» (-0.0529)
