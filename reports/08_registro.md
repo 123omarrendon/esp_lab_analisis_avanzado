@@ -60,4 +60,5 @@
   - El registro está en `mlflow_local.db`, un archivo binario del repo; `models/final_pipeline.joblib` **no se versiona** (hay que regenerarlo con el notebook 07b).
   - **Versión de MLflow:** `requirements.txt` fija `mlflow==3.17.1`, pero `mlflow_local.db` tiene un esquema de MLflow **3.18.0** y 3.17.1 no lo abre (error *out-of-date database schema*). Hay que fijar `mlflow==3.18.0` en `requirements.txt` o regenerar la base; no se cambió `requirements.txt` aquí.
   - Aún no está en Databricks (falta `.env`).
+  - El modelo `champion` ya se exportó a `models/model.joblib` (notebook `09b`, etapa 9).
   - Los supuestos de negocio (costos 5 : 1, `exam_difficulty` conocida antes de avisar) deben confirmarlos la institución y el grupo.

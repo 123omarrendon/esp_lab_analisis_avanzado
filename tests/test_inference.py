@@ -128,3 +128,23 @@ def test_app_module_imports_without_launching_streamlit():
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)   # no ejecuta main(): solo importa
     assert callable(module.main) and module.UNKNOWN == "(no sé)"
+
+
+def test_schema_stores_app_extras(data):
+    schema = make_schema(
+        data, examples={"perfil A": {"edad": 30, "ingreso": 1800.0, "ciudad": "sur"}}, app_title="Mi app",
+        responsible_use="Apoyo, no decisión.", decision_labels={"alto": "Alerta"}, focus_class="alto",
+    )
+    assert schema["examples"]["perfil A"]["ciudad"] == "sur"
+    assert schema["app_title"] == "Mi app" and schema["decision_labels"] == {"alto": "Alerta"}
+    assert schema["focus_class"] == "alto" and "Apoyo" in schema["responsible_use"]
+
+
+def test_schema_rejects_focus_class_that_is_not_a_class(data):
+    with pytest.raises(ValueError, match="focus_class"):
+        make_schema(data, focus_class="inexistente")
+
+
+def test_schema_without_extras_omits_their_keys(data):
+    schema = make_schema(data)
+    assert not {"examples", "app_title", "decision_labels", "focus_class", "responsible_use"} & set(schema)

@@ -9,6 +9,7 @@ Estima la probabilidad de que un estudiante pierda el curso (`pass_70` = `Fail`,
 
 - **Modelo:** regresión logística (`C = 1`) con las 28 variables de la etapa 4, sin calibrar (la calibración no mejoró nada).
 - **Registro:** MLflow **local** (`mlflow_local.db`), modelo `estudiantes_aprueba_o_no` versión 1, alias `champion` (registrado el 2026-11-05; todavía no está en Databricks).
+- **Archivos para la app:** `models/model.joblib` (exportado del registro el 2026-11-06; mismas probabilidades que la prueba de la etapa 7) y `models/input_schema.json` (columnas, rangos posibles, perfiles de ejemplo). **App:** `app/streamlit_app.py`, probada en local; paquete para Databricks Apps en `deploy/databricks_app/` (versionado; se regenera con `scripts/prepare_databricks_app.py`); **despliegue pendiente**.
 - **Regla de decisión:** avisar si P(`Fail`) ≥ 1/6 ≈ 0,167 (menor costo esperado con costos 5 : 1, **supuesto** a validar con la institución).
 
 ## Datos de entrenamiento

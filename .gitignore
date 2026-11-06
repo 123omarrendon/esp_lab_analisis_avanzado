@@ -143,6 +143,8 @@ mlruns/
 .verify-*
 models/final_pipeline.joblib
 
+# deploy/databricks_app SÍ se versiona: Databricks lo trae con «pull» desde la carpeta Git del workspace
+
 # Datos generados por el notebook 03 (se regeneran; no se versionan)
 # data/processed/*
 !data/processed/.gitkeep

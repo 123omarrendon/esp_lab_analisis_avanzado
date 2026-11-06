@@ -1,0 +1,382 @@
+{
+  "numeric": [
+    "previous_exam_score",
+    "previous_gpa",
+    "attendance_percentage",
+    "assignment_completion_rate",
+    "study_hours_per_day",
+    "self_study_hours",
+    "practice_tests_completed",
+    "sleep_hours",
+    "stress_level",
+    "exam_preparation_days",
+    "time_management_score",
+    "exam_anxiety_level"
+  ],
+  "categorical": [
+    "education_level",
+    "school_type",
+    "parent_education",
+    "urban_rural",
+    "class_participation",
+    "study_consistency",
+    "study_environment",
+    "study_method",
+    "revision_frequency",
+    "notes_quality",
+    "sleep_quality",
+    "break_frequency",
+    "motivation_level",
+    "device_availability",
+    "educational_app_usage",
+    "exam_difficulty"
+  ],
+  "class_names": [
+    "Pass",
+    "Fail"
+  ],
+  "categories": {
+    "education_level": [
+      "High School",
+      "Undergraduate"
+    ],
+    "school_type": [
+      "Charter",
+      "Private",
+      "Public"
+    ],
+    "parent_education": [
+      "Associate",
+      "Bachelor",
+      "Doctorate",
+      "High School",
+      "Master"
+    ],
+    "urban_rural": [
+      "Rural",
+      "Suburban",
+      "Urban"
+    ],
+    "class_participation": [
+      "High",
+      "Low",
+      "Medium"
+    ],
+    "study_consistency": [
+      "High",
+      "Low",
+      "Medium"
+    ],
+    "study_environment": [
+      "Moderate",
+      "Noisy",
+      "Quiet"
+    ],
+    "study_method": [
+      "Flashcards",
+      "Group Study",
+      "Practice Tests",
+      "Self-Reading",
+      "Summarizing"
+    ],
+    "revision_frequency": [
+      "Daily",
+      "Rarely",
+      "Weekly"
+    ],
+    "notes_quality": [
+      "Average",
+      "Excellent",
+      "Poor"
+    ],
+    "sleep_quality": [
+      "Excellent",
+      "Fair",
+      "Good",
+      "Poor"
+    ],
+    "break_frequency": [
+      "Frequently",
+      "Occasionally",
+      "Rarely"
+    ],
+    "motivation_level": [
+      "High",
+      "Low",
+      "Medium"
+    ],
+    "device_availability": [
+      "Dedicated",
+      "Shared"
+    ],
+    "educational_app_usage": [
+      "High",
+      "Low",
+      "Moderate"
+    ],
+    "exam_difficulty": [
+      "Easy",
+      "Hard",
+      "Medium"
+    ]
+  },
+  "observed_range": {
+    "previous_exam_score": [
+      30.0,
+      100.0
+    ],
+    "previous_gpa": [
+      1.0,
+      4.0
+    ],
+    "attendance_percentage": [
+      46.34,
+      100.0
+    ],
+    "assignment_completion_rate": [
+      20.0,
+      100.0
+    ],
+    "study_hours_per_day": [
+      0.5,
+      12.0
+    ],
+    "self_study_hours": [
+      0.25,
+      10.0
+    ],
+    "practice_tests_completed": [
+      0.0,
+      20.0
+    ],
+    "sleep_hours": [
+      3.0,
+      11.0
+    ],
+    "stress_level": [
+      5.0,
+      10.0
+    ],
+    "exam_preparation_days": [
+      1.0,
+      30.0
+    ],
+    "time_management_score": [
+      17.77,
+      100.0
+    ],
+    "exam_anxiety_level": [
+      1.0,
+      10.0
+    ]
+  },
+  "median": {
+    "previous_exam_score": 69.55,
+    "previous_gpa": 2.78,
+    "attendance_percentage": 84.76,
+    "assignment_completion_rate": 69.57,
+    "study_hours_per_day": 2.67,
+    "self_study_hours": 1.84,
+    "practice_tests_completed": 5.0,
+    "sleep_hours": 7.0,
+    "stress_level": 10.0,
+    "exam_preparation_days": 16.0,
+    "time_management_score": 79.01,
+    "exam_anxiety_level": 9.48
+  },
+  "integer_columns": [
+    "practice_tests_completed",
+    "stress_level",
+    "exam_preparation_days"
+  ],
+  "valid_range": {
+    "previous_exam_score": [
+      0.0,
+      100.0
+    ],
+    "attendance_percentage": [
+      0.0,
+      100.0
+    ],
+    "assignment_completion_rate": [
+      0.0,
+      100.0
+    ],
+    "previous_gpa": [
+      1.0,
+      4.0
+    ],
+    "sleep_hours": [
+      0.0,
+      24.0
+    ],
+    "study_hours_per_day": [
+      0.0,
+      24.0
+    ],
+    "self_study_hours": [
+      0.0,
+      24.0
+    ],
+    "practice_tests_completed": [
+      0.0,
+      200.0
+    ],
+    "stress_level": [
+      1.0,
+      10.0
+    ],
+    "exam_preparation_days": [
+      0.0,
+      365.0
+    ],
+    "time_management_score": [
+      0.0,
+      100.0
+    ],
+    "exam_anxiety_level": [
+      1.0,
+      10.0
+    ]
+  },
+  "labels": {
+    "previous_exam_score": "Nota del examen previo (0–100)",
+    "previous_gpa": "Promedio previo (1–4)",
+    "attendance_percentage": "Asistencia (%)",
+    "assignment_completion_rate": "Tareas entregadas (%)",
+    "study_hours_per_day": "Horas de estudio por día",
+    "self_study_hours": "Horas de estudio autónomo",
+    "practice_tests_completed": "Pruebas de práctica completadas",
+    "sleep_hours": "Horas de sueño",
+    "stress_level": "Nivel de estrés (1–10)",
+    "exam_preparation_days": "Días de preparación del examen",
+    "time_management_score": "Manejo del tiempo (0–100)",
+    "exam_anxiety_level": "Ansiedad ante el examen (1–10)",
+    "education_level": "Nivel educativo",
+    "school_type": "Tipo de colegio",
+    "parent_education": "Educación de los padres",
+    "urban_rural": "Zona",
+    "class_participation": "Participación en clase",
+    "study_consistency": "Constancia de estudio",
+    "study_environment": "Ambiente de estudio",
+    "study_method": "Método de estudio",
+    "revision_frequency": "Frecuencia de repaso",
+    "notes_quality": "Calidad de los apuntes",
+    "sleep_quality": "Calidad del sueño",
+    "break_frequency": "Frecuencia de descansos",
+    "motivation_level": "Motivación",
+    "device_availability": "Dispositivo",
+    "educational_app_usage": "Uso de apps educativas",
+    "exam_difficulty": "Dificultad del examen (¿se conoce al avisar?)"
+  },
+  "review_threshold": 0.55,
+  "cost_matrix": [
+    [
+      0.0,
+      1.0
+    ],
+    [
+      5.0,
+      0.0
+    ]
+  ],
+  "examples": {
+    "Perfil de riesgo alto (P(Fail) > 90 %)": {
+      "previous_exam_score": 62.47,
+      "previous_gpa": 2.6,
+      "attendance_percentage": 92.92,
+      "assignment_completion_rate": 60.71,
+      "study_hours_per_day": 2.44,
+      "self_study_hours": 1.93,
+      "practice_tests_completed": 6.0,
+      "sleep_hours": 7.44,
+      "stress_level": 10.0,
+      "exam_preparation_days": 6.0,
+      "time_management_score": 73.17,
+      "exam_anxiety_level": 8.08,
+      "education_level": "High School",
+      "school_type": "Public",
+      "parent_education": "High School",
+      "urban_rural": "Suburban",
+      "class_participation": "Medium",
+      "study_consistency": "Medium",
+      "study_environment": "Moderate",
+      "study_method": "Practice Tests",
+      "revision_frequency": "Daily",
+      "notes_quality": "Average",
+      "sleep_quality": "Fair",
+      "break_frequency": "Rarely",
+      "motivation_level": "Low",
+      "device_availability": "Dedicated",
+      "educational_app_usage": "Low",
+      "exam_difficulty": "Medium"
+    },
+    "Perfil de riesgo intermedio (P(Fail) entre 40 % y 60 %)": {
+      "previous_exam_score": 74.33,
+      "previous_gpa": 2.85,
+      "attendance_percentage": 79.37,
+      "assignment_completion_rate": 77.46,
+      "study_hours_per_day": 3.09,
+      "self_study_hours": 1.86,
+      "practice_tests_completed": 4.0,
+      "sleep_hours": 7.62,
+      "stress_level": 8.0,
+      "exam_preparation_days": 12.0,
+      "time_management_score": 70.2,
+      "exam_anxiety_level": 10.0,
+      "education_level": "Undergraduate",
+      "school_type": "Private",
+      "parent_education": "High School",
+      "urban_rural": "Rural",
+      "class_participation": "High",
+      "study_consistency": "Medium",
+      "study_environment": "Moderate",
+      "study_method": "Summarizing",
+      "revision_frequency": "Daily",
+      "notes_quality": "Average",
+      "sleep_quality": "Fair",
+      "break_frequency": "Frequently",
+      "motivation_level": "Low",
+      "device_availability": "Dedicated",
+      "educational_app_usage": "High",
+      "exam_difficulty": "Easy"
+    },
+    "Perfil de riesgo bajo (P(Fail) < 5 %)": {
+      "previous_exam_score": 84.0,
+      "previous_gpa": 3.38,
+      "attendance_percentage": 82.27,
+      "assignment_completion_rate": 81.23,
+      "study_hours_per_day": 6.15,
+      "self_study_hours": 3.74,
+      "practice_tests_completed": 7.0,
+      "sleep_hours": 8.78,
+      "stress_level": 6.0,
+      "exam_preparation_days": 25.0,
+      "time_management_score": 63.4,
+      "exam_anxiety_level": 6.22,
+      "education_level": "High School",
+      "school_type": "Public",
+      "parent_education": "Master",
+      "urban_rural": "Rural",
+      "class_participation": "Low",
+      "study_consistency": "Medium",
+      "study_environment": "Quiet",
+      "study_method": "Summarizing",
+      "revision_frequency": "Weekly",
+      "notes_quality": "Average",
+      "sleep_quality": "Excellent",
+      "break_frequency": "Occasionally",
+      "motivation_level": "High",
+      "device_availability": "Shared",
+      "educational_app_usage": "Moderate",
+      "exam_difficulty": "Hard"
+    }
+  },
+  "app_title": "Alerta de pérdida del curso (pass_70)",
+  "responsible_use": "- Es una **alerta para revisión humana**: no decide por sí sola ni debe usarse para sancionar, excluir o limitar oportunidades.\n- Estima la probabilidad de **no alcanzar 70** a partir de hábitos y datos previos; no es una certeza sobre el futuro del estudiante.\n- Con costos 5 : 1 (supuesto) avisa a ≈ 90 de cada 100 estudiantes y avisa más a quienes tienen ingreso familiar bajo: revisa cada caso.\n- Entrenada con un dataset público de Kaggle, posiblemente sintético: no la uses con otra población sin validarla de nuevo.\n- Límites completos en `models/ficha_modelo.md`.",
+  "decision_labels": {
+    "Fail": "ALERTA: posible pérdida del curso",
+    "Pass": "Sin alerta"
+  },
+  "focus_class": "Fail"
+}

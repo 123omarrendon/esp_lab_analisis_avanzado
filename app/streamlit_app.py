@@ -1,14 +1,17 @@
-"""App de tu proyecto: un formulario que se construye solo a partir de `models/input_schema.json`.
+"""App del proyecto: alerta de posible pérdida del curso (pass_70). El formulario se construye solo a partir de
+`models/input_schema.json`.
 
-- Carga `models/model.joblib` desde ESTE repositorio. NO consulta Databricks: no se ponen credenciales
-  en la nube, y la app no depende de la cuota de ninguna plataforma.
+- Carga `models/model.joblib` desde ESTE repositorio (o desde la carpeta de la app en Databricks Apps). NO consulta
+  MLflow ni el registro de Databricks: no hay credenciales en la app, y no depende de la cuota de ninguna plataforma.
 - Valida las entradas: si un dato es imposible, explica qué corregir en vez de responder cualquier cosa.
+- Ofrece perfiles de ejemplo (filas reales del entrenamiento) para empezar el formulario desde algo razonable.
 
-Ejecutar en local (desde la raíz de tu repo):  streamlit run app/streamlit_app.py
+Ejecutar en local (desde la raíz del repo):  streamlit run app/streamlit_app.py
+En Databricks Apps: el paquete que arma `scripts/prepare_databricks_app.py` mantiene este mismo diseño de carpetas
+(app/, src/, models/) y su `app.yaml` lanza este archivo; ver `reports/09_despliegue.md`.
 
-Para personalizarla (título, etiquetas, aviso de uso responsable) edita `models/input_schema.json`
-(claves `app_title`, `labels`, `responsible_use`) o este archivo. Pídele a Claude cambios pequeños,
-de uno en uno, y pruébalos con `streamlit run`.
+Para personalizarla (título, etiquetas, ejemplos, aviso de uso responsable) edita `models/input_schema.json`
+(claves `app_title`, `labels`, `examples`, `decision_labels`, `focus_class`, `responsible_use`) o este archivo.
 """
 import importlib
 import sys
@@ -51,6 +54,25 @@ def label(schema: dict, column: str) -> str:
     return schema.get("labels", {}).get(column, column)
 
 
+NO_EXAMPLE = "(formulario vacío)"
+
+
+def apply_example() -> None:
+    """Rellena el formulario con el perfil de ejemplo elegido (se ejecuta al cambiar el selector)."""
+    schema = get_schema()
+    name = st.session_state.get("example_choice", NO_EXAMPLE)
+    example = schema.get("examples", {}).get(name)
+    if not example:
+        return
+    for column in schema["numeric"]:
+        low, high = schema.get("valid_range", {}).get(column) or schema["observed_range"][column]
+        value = min(max(float(example[column]), low), high)
+        st.session_state[f"unk_num_{column}"] = False
+        st.session_state[f"num_{column}"] = int(round(value)) if column in schema.get("integer_columns", []) else value
+    for column in schema["categorical"]:
+        st.session_state[f"cat_{column}"] = str(example[column])
+
+
 def numeric_field(schema: dict, column: str, key: str):
     """Un campo numérico con su rango y mediana, y una casilla 'no sé' que deja el dato vacío."""
     low, high = schema.get("valid_range", {}).get(column) or schema["observed_range"][column]
@@ -62,9 +84,11 @@ def numeric_field(schema: dict, column: str, key: str):
     unknown = st.checkbox(f"No sé: {label(schema, column)}", key=f"unk_{key}")
     if unknown:
         return np.nan
+    # Si un perfil de ejemplo ya fijó el valor en session_state, no se pasa `value` (Streamlit avisa si van los dos).
+    start = {} if key in st.session_state else {"value": int(round(default)) if is_int else float(default)}
     if is_int:
-        return st.number_input(label(schema, column), min_value=int(low), max_value=int(high), value=int(round(default)), step=1, key=key)
-    return st.number_input(label(schema, column), min_value=float(low), max_value=float(high), value=float(default), key=key)
+        return st.number_input(label(schema, column), min_value=int(low), max_value=int(high), step=1, key=key, **start)
+    return st.number_input(label(schema, column), min_value=float(low), max_value=float(high), key=key, **start)
 
 
 def build_form(schema: dict) -> dict:
@@ -84,19 +108,23 @@ def build_form(schema: dict) -> dict:
 
 
 def main() -> None:
-    st.set_page_config(page_title="Mi proyecto", page_icon="🧭", layout="wide")
+    st.set_page_config(page_title="Alerta de pérdida del curso", page_icon="🎓", layout="wide")
 
     if not MODEL_PATH.exists() or not SCHEMA_PATH.exists():
-        st.title("Mi proyecto")
+        st.title("Alerta de pérdida del curso")
         st.error(
             "Falta `models/model.joblib` o `models/input_schema.json`. "
-            "Ejecuta el notebook `notebooks/09_inferencia.ipynb` para generarlos."
+            "Ejecuta el notebook `notebooks/09b_inferencia_aprueba_o_no.ipynb` para generarlos."
         )
         st.stop()
 
     model, schema = get_model(), get_schema()
-    st.title(schema.get("app_title", "Mi proyecto"))
+    st.title(schema.get("app_title", "Alerta de pérdida del curso"))
     st.caption("Herramienta de apoyo a la decisión. **No decide por sí sola.**")
+
+    if schema.get("examples"):
+        st.selectbox("Empezar desde un perfil de ejemplo (estudiantes reales del entrenamiento)",
+                     [NO_EXAMPLE] + list(schema["examples"]), key="example_choice", on_change=apply_example)
 
     with st.form("entrada"):
         row = build_form(schema)
@@ -116,7 +144,11 @@ def main() -> None:
     class_names = schema["class_names"]
     left, right = st.columns(2)
     with left:
-        st.metric("Resultado sugerido", str(first["decision"]))
+        decision = str(first["decision"])
+        st.metric("Resultado sugerido", schema.get("decision_labels", {}).get(decision, decision))
+        focus = schema.get("focus_class")
+        if focus:
+            st.metric(f"Probabilidad de {focus}", f"{first[f'proba_{focus}']:.1%}".replace(".", ","))
         detail = f"Clase más probable: **{first['most_likely']}**"
         if "expected_cost" in result.columns:
             detail += f" · costo esperado de esta decisión: **{first['expected_cost']:.2f}**"

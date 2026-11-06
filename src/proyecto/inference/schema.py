@@ -34,6 +34,11 @@ def build_schema(
     valid_range: dict | None = None,
     labels: dict | None = None,
     review_threshold: float = 0.55,
+    examples: dict | None = None,
+    app_title: str | None = None,
+    responsible_use: str | None = None,
+    decision_labels: dict | None = None,
+    focus_class: str | None = None,
     path: str | Path | None = None,
 ) -> dict:
     """Construye (y opcionalmente guarda) el esquema de entrada a partir de los datos de ENTRENAMIENTO.
@@ -46,6 +51,11 @@ def build_schema(
     - `valid_range`: opcional; {columna: (mínimo, máximo)} de lo que es POSIBLE en el mundo real. Fuera de ese
       rango, `predict` se niega a responder. Distinto del rango observado, que solo genera una advertencia.
     - `labels`: opcional; {columna: etiqueta legible} para la app.
+    - `examples`: opcional; {nombre: {columna: valor}} con perfiles de ejemplo (filas reales del entrenamiento) que
+      la app ofrece para empezar el formulario desde algo razonable.
+    - `app_title` / `responsible_use`: opcionales; título y aviso de uso responsable que muestra la app.
+    - `decision_labels`: opcional; {clase: texto} para mostrar la decisión en palabras de negocio (p. ej. Fail → «Alerta»).
+    - `focus_class`: opcional; clase de interés, cuya probabilidad la app destaca (p. ej. «Fail»).
     """
     missing = [c for c in numeric + categorical if c not in df.columns]
     if missing:
@@ -79,6 +89,18 @@ def build_schema(
             schema["integer_columns"].append(col)
     if cost_matrix is not None:
         schema["cost_matrix"] = np.asarray(cost_matrix, dtype=float).tolist()
+    if examples:
+        schema["examples"] = {str(k): dict(v) for k, v in examples.items()}
+    if app_title:
+        schema["app_title"] = app_title
+    if responsible_use:
+        schema["responsible_use"] = responsible_use
+    if decision_labels:
+        schema["decision_labels"] = {str(k): str(v) for k, v in decision_labels.items()}
+    if focus_class:
+        if focus_class not in schema["class_names"]:
+            raise ValueError(f"focus_class '{focus_class}' no está en class_names {schema['class_names']}")
+        schema["focus_class"] = focus_class
     if path is not None:
         save_schema(schema, path)
     return schema

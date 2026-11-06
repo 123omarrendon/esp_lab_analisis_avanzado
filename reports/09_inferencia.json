@@ -1,0 +1,68 @@
+{
+  "fecha_y_hora": "2026-11-06T11:22:15",
+  "modelo_exportado_desde": "registro de MLflow (local), estudiantes_aprueba_o_no@champion",
+  "modelo_registrado": "estudiantes_aprueba_o_no v1 @champion",
+  "model_joblib_kb": 3.7,
+  "identico_al_evaluado_en_la_etapa_7": true,
+  "esquema": {
+    "numericas": 12,
+    "categoricas": 16,
+    "con_rango_posible": 12,
+    "ejemplos": [
+      "Perfil de riesgo alto (P(Fail) > 90 %)",
+      "Perfil de riesgo intermedio (P(Fail) entre 40 % y 60 %)",
+      "Perfil de riesgo bajo (P(Fail) < 5 %)"
+    ]
+  },
+  "pruebas_app_local": [
+    {
+      "caso": "Perfil de riesgo alto (P(Fail) > 90 %)",
+      "p_fail_app": 0.938,
+      "decision_app": "ALERTA: posible pérdida del curso",
+      "p_fail_directa": 0.9375356705275173,
+      "decision_directa": "Fail",
+      "revision": false,
+      "coincide": true
+    },
+    {
+      "caso": "Perfil de riesgo intermedio (P(Fail) entre 40 % y 60 %)",
+      "p_fail_app": 0.469,
+      "decision_app": "ALERTA: posible pérdida del curso",
+      "p_fail_directa": 0.4693736470406935,
+      "decision_directa": "Fail",
+      "revision": true,
+      "coincide": true
+    },
+    {
+      "caso": "Perfil de riesgo bajo (P(Fail) < 5 %)",
+      "p_fail_app": 0.047,
+      "decision_app": "Sin alerta",
+      "p_fail_directa": 0.04742003197523584,
+      "decision_directa": "Pass",
+      "revision": false,
+      "coincide": true
+    }
+  ],
+  "con_no_se": {
+    "decision": "ALERTA: posible pérdida del curso",
+    "p_fail": "46,9%"
+  },
+  "paquete_databricks_apps": {
+    "carpeta": "deploy/databricks_app",
+    "archivos": [
+      "app.yaml",
+      "app/streamlit_app.py",
+      "models/ficha_modelo.md",
+      "models/input_schema.json",
+      "models/model.joblib",
+      "requirements.txt",
+      "src/proyecto/__init__.py",
+      "src/proyecto/inference/__init__.py",
+      "src/proyecto/inference/predict.py",
+      "src/proyecto/inference/schema.py"
+    ],
+    "corre_solo": true,
+    "mb": 0.038
+  },
+  "despliegue_en_databricks": "pendiente: se hace desde la interfaz de Databricks (carpeta Git + Apps), con la cuenta del usuario; pasos en reports/09_despliegue.md"
+}

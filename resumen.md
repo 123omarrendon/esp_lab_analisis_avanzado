@@ -27,6 +27,7 @@ Predecir, **antes del examen**, qué estudiantes van a **perder el curso** para 
 | `06b_optimizacion_aprueba_o_no.ipynb` | 6 · Optimización | `06_optimizacion.ipynb` y CreditSight | Optimiza el modelo ganador (regresión logística) con Optuna y MLflow, y comprueba con estudiantes reservados si la mejora es real |
 | `07b_validacion_aprueba_o_no.ipynb` | 7 · Validación | `07_validacion_interpretacion.ipynb` y CreditSight | Congela las decisiones (¿calibrar?), abre la prueba **una sola vez**, mide con intervalos frente a «avisar a todos», audita la equidad por grupo e interpreta el modelo (coeficientes y SHAP) |
 | `08b_registro_modelo_aprueba_o_no.ipynb` | 8 · Registro | `08_registro_modelo.ipynb` (esqueleto) y CreditSight | Registra el modelo final en MLflow (versión 1, alias `champion`) con firma, métricas de la prueba y etiquetas; comprueba la ida y vuelta y responde si el modelo mejoró con las iteraciones |
+| `09b_inferencia_aprueba_o_no.ipynb` | 9 · Inferencia y app | `09_inferencia.ipynb` (esqueleto) y CreditSight | Exporta `models/model.joblib` desde `champion`, escribe el esquema de entrada (rangos posibles, perfiles de ejemplo), comprueba que da las mismas probabilidades que la prueba, ejecuta la app de Streamlit con `AppTest` y arma el paquete para Databricks Apps |
 
 Cada uno continúa al anterior y solo **orquesta**: la lógica vive en `src/`.
 
@@ -40,7 +41,9 @@ Cada uno continúa al anterior y solo **orquesta**: la lógica vive en `src/`.
 | `models/tuning.py` | Optimización con Optuna (`tune`): espacio de `C` y umbral de decisión, cada ensayo registrado en MLflow; intervalos del 95 % por remuestreo de estudiantes (`bootstrap_cost_difference`) |
 | `models/validation.py` | Etapa 7: regla de calibración (`decide_calibration`), decisiones congeladas con fecha y hora (`freeze_decisions`), prueba que se abre una sola vez (`open_test_once`), intervalos de una métrica (`metric_with_ci`), desempeño por grupo (`segment_table`, `age_band`) e interpretación (`coefficient_table`, `shap_importance`, `student_contributions`) |
 | `models/train.py` | Candidatos del torneo (`candidates`: 5 modelos + 2 referencias, `MeanProbabilityRegressor` para usar un `DummyRegressor` como clasificador), `build_pipeline`, métricas de negocio (`business_metrics`), `evaluate_folds`, avisar solo al k % más riesgoso (`top_k_alert`) |
-| `tests/test_cleaning.py`, `test_split.py`, `test_features.py`, `test_train.py`, `test_tuning.py`, `test_validation.py` (+ `toy.py`) | Pruebas armadas a mano; todas pasan (124 en `tests/`, con las de seguimiento e inferencia) |
+| `inference/schema.py` y `inference/predict.py` | Etapa 9: esquema de entrada (columnas, rangos posibles, categorías, perfiles de ejemplo, textos de la app) y predicción que **valida** (se niega con datos imposibles) y decide por costo mínimo |
+| `app/streamlit_app.py` y `scripts/prepare_databricks_app.py` | App de Streamlit (formulario, «No sé», perfiles de ejemplo, alerta con probabilidad) y armado del paquete para Databricks Apps (`app.yaml`, `requirements.txt` mínimo) |
+| `tests/test_cleaning.py`, `test_split.py`, `test_features.py`, `test_train.py`, `test_tuning.py`, `test_validation.py` (+ `toy.py`) | Pruebas armadas a mano; todas pasan (133 en `tests/`, con las de seguimiento, inferencia y paquete de Databricks) |
 
 **Pruebas que pueden fallar:** se introdujeron errores a propósito (por ejemplo `>` en vez de `>=` en el corte de 70, umbral invertido, una columna de fuga entre las variables, partir sin estratificar) y las pruebas los detectaron todos. Dos mutaciones sobrevivieron al principio y se corrigieron las pruebas.
 
@@ -155,6 +158,14 @@ Estrategias **sin modelo** con costos 5 : 1 (costo por estudiante, menor es mejo
 - **Aviso de reproducibilidad:** `mlflow_local.db` es de MLflow **3.18.0** y `requirements.txt` fija 3.17.1, que no la abre; hay que alinear una de las dos.
 - Archivos: `reports/08_registro.md`, `08_registro.json`, `08_evolucion_modelo.csv`; ficha en `models/ficha_modelo.md`.
 
+### Etapa 9 · Inferencia y app (`09b`) — app lista, despliegue en Databricks pendiente
+
+- **Qué se hizo:** `models/model.joblib` se exportó del registro (`estudiantes_aprueba_o_no@champion`; 3,7 KB) y se comprobó que da **exactamente las mismas probabilidades** que la prueba de la etapa 7 (diferencia 0,0; costo 0,2550). `models/input_schema.json` guarda las 28 columnas, los **rangos posibles** (fuera de ellos la app se niega y explica qué corregir) y **tres perfiles de ejemplo** de estudiantes reales del entrenamiento.
+- **Cómo decide la app:** «avisar si P(`Fail`) ≥ 1/6», la misma regla de la etapa 7 (comprobada en 2.000 estudiantes). Muestra el resultado, la probabilidad de `Fail`, el aviso «revisión recomendada» cuando duda, la matriz de costos y el uso responsable. **No consulta MLflow ni Databricks.**
+- **Pruebas con la app real (`AppTest`):** riesgo alto → **alerta, 93,8 %**; intermedio → alerta con revisión, **46,9 %**; bajo → **sin alerta, 4,7 %**; con «No sé» en la nota previa responde; datos imposibles (30 h de estudio, nota 250, promedio 7) → se niega con un mensaje claro. Capturas de la app en el Word y en la presentación.
+- **Databricks Apps:** `python scripts/prepare_databricks_app.py` arma `deploy/databricks_app/` (10 archivos, 0,04 MB: app, `inference/`, modelo, esquema, ficha, `app.yaml`, `requirements.txt` con 5 paquetes; sin datos ni credenciales) y **se comprobó que corre sola** en un proceso aparte. **Falta desplegar**: se hace **sin CLI**, desde la interfaz web de Databricks: `git push` del paquete (`deploy/databricks_app/` ya no está ignorado), carpeta Git con *Pull* y Compute → Apps → Deploy. Pasos y plan B en `reports/09_despliegue.md`. **No hay enlace público todavía.**
+- Archivos: `reports/09_inferencia.json`, `reports/09_despliegue.md`, `models/model.joblib`, `models/input_schema.json`.
+
 ## 4. ¿Qué modelo gana y cuál tiene mejor precisión?
 
 **Modelo ganador: regresión logística** (un solo ganador, como se pidió).
@@ -198,15 +209,16 @@ Estrategias **sin modelo** con costos 5 : 1 (costo por estudiante, menor es mejo
 1. Confirmar los supuestos de la sección 7.
 2. Aprobación del grupo de las decisiones de las etapas 4 a 7 (y decidir con la institución qué hacer con la brecha de alertas por ingreso).
 3. Registrar el modelo en Databricks (completar `.env`) y alinear la versión de MLflow (`requirements.txt` frente a `mlflow_local.db`).
-4. Etapa 9: exportar `models/model.joblib` desde `champion` y la app en Streamlit (la app no consulta Databricks).
+4. Desplegar la app en Databricks Apps (pasos en `reports/09_despliegue.md`; ya están listos el modelo exportado, la app y el paquete), probar el enlace en una ventana privada y anotar el resultado.
 
 ## 9. Cómo reproducirlo
 
 ```bash
 uv pip install -r requirements.txt     # Python 3.12
 pytest -q                              # pruebas de data, features y models
-# Ejecutar los notebooks en orden: 01b, 02b, 03b, 04b, 05b, 06b, 07b
+# Ejecutar los notebooks en orden: 01b, 02b, 03b, 04b, 05b, 06b, 07b, 08b, 09b
 # (04b, 05b y 06b leen data/processed/train.joblib, que genera 03b; 07b abre test.joblib UNA vez y deja reports/prueba_abierta.txt)
+# 09b exporta models/model.joblib y arma deploy/databricks_app; la app en local: streamlit run app/streamlit_app.py
 # 06b registra en Databricks si corre en el workspace o hay .env con la conexión; si no, cae a mlflow_local.db
 # (ignorado por Git): mlflow ui --backend-store-uri sqlite:///mlflow_local.db
 ```

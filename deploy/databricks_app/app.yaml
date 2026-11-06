@@ -1,0 +1,6 @@
+# Configuración de la app para Databricks Apps.
+# Lanza la misma app que se prueba en local: streamlit run app/streamlit_app.py
+command: ["streamlit", "run", "app/streamlit_app.py"]
+env:
+  - name: STREAMLIT_BROWSER_GATHER_USAGE_STATS
+    value: "false"
