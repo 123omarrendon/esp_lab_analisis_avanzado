@@ -10,7 +10,7 @@
 | Enlace público de la app | **Pendiente** (se genera al desplegar en Databricks Apps) |
 | Plataforma | **Databricks Apps** (aplicación tipo Streamlit alojada en el workspace). La app **no consulta** MLflow ni el registro: carga `models/model.joblib` de su propia carpeta |
 | Código | `app/streamlit_app.py` (rama `feature/orendon`); paquete listo en `deploy/databricks_app/` (**se versiona** para que Databricks lo traiga con *Pull*; se regenera con `python scripts/prepare_databricks_app.py`) |
-| Versión de Python | ☑ 3.12 con la que se entrenó y probó → **riesgo:** Databricks Apps puede traer otra versión menor de Python; las versiones de `scikit-learn`, `pandas`, `numpy`, `streamlit` y `joblib` quedan fijadas en el `requirements.txt` del paquete |
+| Versión de Python | ☑ 3.12 con la que se entrenó; ☑ **3.11 en Databricks Apps** (comprobado: la app del paquete corre con Python 3.11 y da los mismos resultados). `numpy` va con rango (`>=2.3,<2.5`) porque 2.5.x exige 3.12; las demás versiones están fijadas |
 | ¿Se comprobó en una ventana privada? | ☐ no aplica todavía (no hay enlace) |
 | ¿Se desplegó? | ☐ sí  ☑ no → **plan B** (apartado 4) |
 
@@ -47,6 +47,7 @@ Además: el formulario muestra los 12 campos numéricos, las 16 listas y las 12 
 ## 4. Problemas encontrados y plan B
 
 - **Encontrados y resueltos:** (1) Streamlit avisaba de que un campo tenía valor por defecto y también valor puesto por el perfil de ejemplo → ahora no se pasa el valor por defecto cuando el perfil ya lo fijó; (2) un booleano de NumPy no se podía guardar en JSON → se convirtió; (3) el notebook 09 de la plantilla era un esqueleto sin configurar → se creó el `09b` completo.
+- **Error en el primer despliegue (2026-11-06 11:44):** el *build* de Databricks Apps falló al instalar `requirements.txt` con «Ignored the following versions that require a different python version: … 2.5.4 Requires-Python >=3.12». **Causa:** Databricks Apps usa Python 3.11 y el proyecto usa 3.12; `numpy==2.5.4` exige 3.12 o más. **Arreglo:** en el paquete `numpy` pasa a `numpy>=2.3,<2.5` (resuelve a 2.4.x); `pandas==3.0.6`, `scikit-learn==1.9.1`, `streamlit==1.66.0` y `joblib==1.6.0` se mantienen (comprobado). **Comprobación:** se creó un entorno con Python 3.11, se instaló el `requirements.txt` nuevo y se ejecutó la app del paquete: mismos resultados (alto 93,8 %, intermedio 46,9 %, bajo 4,7 %). Está en `scripts/prepare_databricks_app.py` (`REQUIREMENT_OVERRIDES`) y tiene prueba. **Para aplicarlo:** `git push`, *Pull* en el Git folder y *Deploy* otra vez.
 - **No resuelto, depende de la cuenta de Databricks:** el despliegue. Se probó todo lo que no lo necesita.
 - **Plan B** (si la app falla en vivo): capturas de la app en local (`img` del Word y de la presentación, tomadas con Edge el 2026-11-06) y `streamlit run app/streamlit_app.py` en el equipo del grupo.
 - **Plan de despliegue escrito (sin CLI: `git push`, *Pull* en Databricks y despliegue desde la interfaz):**

@@ -41,6 +41,12 @@ def test_runtime_requirements_keep_only_what_the_app_imports(fake_root, tmp_path
     assert "mlflow" not in text and "optuna" not in text
 
 
+def test_numpy_uses_a_range_that_installs_on_python_311(fake_root, tmp_path):
+    prep.build_bundle(fake_root, tmp_path / "out")
+    text = (tmp_path / "out" / "requirements.txt").read_text(encoding="utf-8")
+    assert "numpy>=2.3,<2.5" in text and "numpy==2.0" not in text
+
+
 def test_app_yaml_launches_the_streamlit_app(fake_root, tmp_path):
     prep.build_bundle(fake_root, tmp_path / "out")
     text = (tmp_path / "out" / "app.yaml").read_text(encoding="utf-8")

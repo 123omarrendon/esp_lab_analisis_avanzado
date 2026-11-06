@@ -1,5 +1,5 @@
 {
-  "fecha_y_hora": "2026-11-06T11:22:15",
+  "fecha_y_hora": "2026-11-06T11:48:28",
   "modelo_exportado_desde": "registro de MLflow (local), estudiantes_aprueba_o_no@champion",
   "modelo_registrado": "estudiantes_aprueba_o_no v1 @champion",
   "model_joblib_kb": 3.7,

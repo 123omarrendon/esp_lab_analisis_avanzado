@@ -36,6 +36,10 @@ APP_FILES = [
 ]
 # Solo lo que importa la app en tiempo de ejecución (el modelo es un Pipeline de scikit-learn: no necesita nada de src/ más).
 RUNTIME_PACKAGES = ("streamlit", "pandas", "numpy", "scikit-learn", "joblib")
+# Databricks Apps usa Python 3.11 (menor que el 3.12 del proyecto): numpy 2.5.x exige 3.12 o más y pip lo descarta
+# («Ignored the following versions that require a different python version: ... 2.5.4»). Para numpy se usa un rango que
+# resuelve en 3.11; las demás versiones se mantienen fijas (comprobado: resuelven en Python 3.11).
+REQUIREMENT_OVERRIDES = {"numpy": "numpy>=2.3,<2.5"}
 
 APP_YAML = """# Configuración de la app para Databricks Apps.
 # Lanza la misma app que se prueba en local: streamlit run app/streamlit_app.py
@@ -52,8 +56,8 @@ def runtime_requirements(requirements_path: Path) -> str:
     for line in requirements_path.read_text(encoding="utf-8").splitlines():
         match = re.match(r"^([A-Za-z0-9_.\-]+)==", line.strip())
         if match and match.group(1).lower() in wanted:
-            found.append(line.strip())
-    missing = wanted - {re.split(r"==", f)[0].lower() for f in found}
+            found.append(REQUIREMENT_OVERRIDES.get(match.group(1).lower(), line.strip()))
+    missing = wanted - {re.split(r"==|>=", f)[0].lower() for f in found}
     if missing:
         raise ValueError(f"Faltan en requirements.txt (con versión fijada): {', '.join(sorted(missing))}")
     return "\n".join(found) + "\n"
