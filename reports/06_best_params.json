@@ -27,6 +27,6 @@
     ]
   },
   "ensayos": 25,
-  "mlflow_parent_run_id": "03b36226e14b40688485354167bcf63a",
-  "tracking": "local"
+  "mlflow_parent_run_id": "5106d436c4fe4612bdaea74bf6b9ef36",
+  "tracking": "databricks (dentro del workspace)"
 }
